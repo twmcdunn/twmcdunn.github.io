@@ -11,32 +11,32 @@
   <body>
   <!-- Put Python code inside the the <py-script> tag -->
     <py-script>
-arr1 = [0,7,8,'q']
-for n in arr1:
-    print(n)
-print(arr1.__contains__(7))
-
-arr = [-3,4,7]
-match arr:
-    case (2,2,*_):
-        print('values are 2, 2')
-    case (x,4,*_) if x < 0:
-        print('the pattern is x,4 and x is negative', f"x={x}")
-    case (x,4,*_) if x >= 0:
-        print('the pattern is x,4 and x is positive')
-    case _:
-        print('a different pattern found')
-
-def sum(anArr):
-    x = 0
-    for n in anArr:
-        x += n
-    print(x)
-    global arr1
-    arr1 = "HI!"
+    arr1 = [0,7,8,'q']
+    for n in arr1:
+        print(n)
+    print(arr1.__contains__(7))
+    
+    arr = [-3,4,7]
+    match arr:
+        case (2,2,*_):
+            print('values are 2, 2')
+        case (x,4,*_) if x < 0:
+            print('the pattern is x,4 and x is negative', f"x={x}")
+        case (x,4,*_) if x >= 0:
+            print('the pattern is x,4 and x is positive')
+        case _:
+            print('a different pattern found')
+    
+    def sum(anArr):
+        x = 0
+        for n in anArr:
+            x += n
+        print(x)
+        global arr1
+        arr1 = "HI!"
+        print(arr1)
+    sum(arr)
     print(arr1)
-sum(arr)
-print(arr1)
     </py-script>
   </body>
 </html>
