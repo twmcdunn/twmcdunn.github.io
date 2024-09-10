@@ -1,3 +1,3 @@
 #import pygame
-#from pyscript import display
-#display("HELLO FROM MAIN")
+from pyscript import display
+display("HELLO FROM MAIN")
