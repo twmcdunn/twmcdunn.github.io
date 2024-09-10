@@ -1,15 +1,9 @@
-#import pygame
-#from pyscript import display
-#display("HELLO FROM MAIN")
+import arrr
+from pyscript import document
 
-import panel as pn
 
-pn.extension(sizing_mode="stretch_width")
-
-slider = pn.widgets.FloatSlider(start=0, end=10, name='Amplitude')
-
-def callback(new):
-    return f'Amplitude is: {new}'
-
-pn.Row(slider, pn.bind(callback, slider)).servable(target='simple_app')
-
+def translate_english(event):
+    input_text = document.querySelector("#english")
+    english = input_text.value
+    output_div = document.querySelector("#output")
+    output_div.innerText = arrr.translate(english)
