@@ -1,4 +1,3 @@
-import pyautogui
 from pyscript import document
 from pyscript import display
 
