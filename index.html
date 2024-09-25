@@ -7,14 +7,27 @@
   <title>Interval Mazes</title>
   <link rel="stylesheet" href="https://pyscript.net/releases/2024.8.2/core.css">
   <script type="module" src="https://pyscript.net/releases/2024.8.2/core.js"></script>
+    <script type="module">
+        const loading = document.getElementById('loading');
+        addEventListener('py:ready', () => loading.close());
+        loading.showModal();
+    </script>
+<style> 
+.prevent-select {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+    #loading { outline: none; border: none; background: transparent }
+</style>
 </head>
 
-<body>
-  <h1>Interval Mazes</h1>
-  <p>updated 4</p>
-  <section class="pyscript">
-  <script type="py" src="./main.py" config="./pyscript.json"></script>
-  </section>
+<body class="prevent-select">
+    <dialog id="loading">
+        <h1>Loading...</h1>
+    </dialog>
+    <script type="py" src="./main.py" config="./pyscript.json"></script>
 </body>
+
 
 </html>
