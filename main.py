@@ -356,7 +356,9 @@ def move():
             winText.setAttribute("font-size", "24pt")
             app.appendChild(winText)
             maestro_complaint("Congratulations, you've ascended to mediocracy.")
-                
+            clear_interval(pitch.aniInter)
+            return
+        
         for n in range(app.childElementCount):
             c = app.children.item(n)
             if not c is None:
