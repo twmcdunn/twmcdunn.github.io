@@ -983,7 +983,10 @@
                         const commentElement = document.createElement('div');
                         commentElement.className = 'comment';
 
-                        const date = comment.date ? new Date(comment.date).toLocaleDateString() : 'Recently';
+                        var date = '';
+                        if (! (comment.POST_DATE === undefined)) {
+                            date = comment.POST_DATE.S;
+                        }
 
                         commentElement.innerHTML = `
                         <div class="comment-header">

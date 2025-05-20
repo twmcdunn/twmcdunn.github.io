@@ -115,6 +115,9 @@ function postComment(compositionID, commentorName, comment, callback) {
                     },
                     COMMENT_NUM: {
                         N: commentNum + ""
+                    },
+                    POST_DATE: {
+                        S: new Date().toLocaleDateString()
                     }
                 },
                 TableName: "DCLP"
@@ -162,7 +165,7 @@ function getComments(compositionID, callback) {
             ":compid": { N: (Number(compositionID) * 1000000) + "" },
             ":compidUpper": { N: ((Number(compositionID) + 1) * 1000000) + "" },
         },
-        ProjectionExpression: "COMMENTOR_NAME, COMMENT_CONTENT",
+        ProjectionExpression: "COMMENTOR_NAME, COMMENT_CONTENT, POST_DATE",
         TableName: "DCLP"
     };
 
