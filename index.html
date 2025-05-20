@@ -984,8 +984,16 @@
                         commentElement.className = 'comment';
 
                         var date = '';
-                        if (! (comment.POST_DATE === undefined)) {
-                            date = comment.POST_DATE.S;
+                        if (! (comment.POST_DATE === undefined) && comment.POST_DATE.N) {
+                            date = new Date(comment.POST_DATE.N).toLocaleDateString();
+                            var secAgo = Date.now() - Number(comment.POST_DATE.N);
+                            if(secAgo < 1000 * 60 * 60 * 24){
+                                date = 'Recently';
+                                if(secAgo > 1000 * 60 * 60){
+                                    var hrs = secAgo / (1000 * 60 * 60);
+                                    date = 'About ' + hrs + ' ago';
+                                }
+                            }
                         }
 
                         commentElement.innerHTML = `

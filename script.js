@@ -117,7 +117,7 @@ function postComment(compositionID, commentorName, comment, callback) {
                         N: commentNum + ""
                     },
                     POST_DATE: {
-                        S: new Date().toLocaleDateString()
+                        N: Date.now() + ""
                     }
                 },
                 TableName: "DCLP"
