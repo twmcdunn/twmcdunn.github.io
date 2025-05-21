@@ -866,6 +866,7 @@
                 const commentsToggle = document.createElement('div');
                 commentsToggle.className = 'comments-toggle';
 
+                /*
                 getComments(Number(composition.ID.N), (comments) => {
                     var count = comments.length;
                     commentsToggle.innerHTML = `
@@ -876,6 +877,17 @@
                     <span class="comments-count">${count}</span>
                 `;
                 });
+                */
+
+                
+                var count = Number(composition.CURRENT_COMMENT_NUM.N);
+                    commentsToggle.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                    <span>Comments</span>
+                    <span class="comments-count">${count}</span>
+                `;
 
                 const commentsContainer = document.createElement('div');
                 commentsContainer.className = 'comments-container';

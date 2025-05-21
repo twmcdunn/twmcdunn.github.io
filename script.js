@@ -28,7 +28,7 @@ var ddb = new AWS.DynamoDB({ apiVersion: "2012-08-10" });
                 N: "0"
             }
         },
-        UpdateExpression: "SET CURRENT_NUM = CURRENT_NUM + :increment",
+        UpdateExpression: "SET CURRENT_NUM = CURRENT_NUM - :increment",
         TableName: "DCLP",
         ReturnValues: "UPDATED_OLD"
     };
@@ -39,7 +39,7 @@ var ddb = new AWS.DynamoDB({ apiVersion: "2012-08-10" });
         else {
             //console.log("CURRENT_EVENT_NUM UPDATED. OLD = ", data.Attributes.CURRENT_NUM.N);
             //console.log(data.Attributes);
-            var linkNum = Number(data.Attributes.CURRENT_NUM.N) + 1;
+            var linkNum = Number(data.Attributes.CURRENT_NUM.N) - 1;
             var params = {
                 Item: {
                     ELEM: {
@@ -105,7 +105,7 @@ function postComment(compositionID, commentorName, comment, callback) {
                         S: "COMMENT_ELEM"
                     },
                     ID: {
-                        N: ((Number(compositionID) * 1000000) + commentNum) + ""
+                        N: ((Number(compositionID) * 1000000) - commentNum) + ""
                     },
                     COMMENT_CONTENT: {
                         S: comment + ""
@@ -142,7 +142,7 @@ function getLinks(callback) {
         ExpressionAttributeValues: {
             ":val": { S: "LINK" }
         },
-        ProjectionExpression: "COMP_URL, ID, TITLE, AUTHOR",
+        ProjectionExpression: "COMP_URL, ID, TITLE, AUTHOR, CURRENT_COMMENT_NUM",
         TableName: "DCLP"
     };
 
@@ -151,7 +151,7 @@ function getLinks(callback) {
             console.log("error", err);
         } else {
             console.log("DATA", data);
-            data.Items.reverse();
+            //data.Items.reverse();
             callback(data.Items);
         }
     })
@@ -159,11 +159,11 @@ function getLinks(callback) {
 
 function getComments(compositionID, callback) {
     var params = {
-        KeyConditionExpression: "ELEM = :val AND ID BETWEEN :compid AND :compidUpper",
+        KeyConditionExpression: "ELEM = :val AND ID BETWEEN :compidLower AND :compid",
         ExpressionAttributeValues: {
             ":val": { S: "COMMENT_ELEM" },
             ":compid": { N: (Number(compositionID) * 1000000) + "" },
-            ":compidUpper": { N: ((Number(compositionID) + 1) * 1000000) + "" },
+            ":compidLower": { N: ((Number(compositionID) - 1) * 1000000) + "" },
         },
         ProjectionExpression: "COMMENTOR_NAME, COMMENT_CONTENT, POST_DATE",
         TableName: "DCLP"
