@@ -344,6 +344,36 @@
             margin-bottom: 1rem;
         }
 
+        .signin-grid {
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            display: none;
+        }
+
+        .signin-grid.active {
+            display: grid;
+        }
+
+        .signin-section {
+            background-color: var(--card);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .signin-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .signin-description {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
         .forum-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(600px, 3fr));
@@ -642,6 +672,22 @@
             <section>
                 <h2>"The Delight of Composition" Forum</h2>
                 <p style="margin-bottom: 1rem;">Discuss technique. Exchange ideas. Share the joy.</p>
+            </section>
+            <div class="signin-grid active" id="signInContainer">
+                <section class="signin-section">
+                    <h3 class="signin-title">Sign In</h3>
+                    <p class="signin-description">
+                        Please sign in to contribute to the forum.
+                    </p>
+                    <script src="https://accounts.google.com/gsi/client" async defer></script>
+                    <div id="g_id_onload"
+                        data-client_id="69084632352-49spqr03c869f4a1cf2ogqbpi598urar.apps.googleusercontent.com"
+                        data-callback="onSignIn">
+                    </div>
+                    <div class="g_id_signin" data-type="standard"></div>
+                </section>
+            </div>
+            <section>
                 <div class="forum-grid" id="forumList">
                     <div class="forum-card">
                         <div class="forum-content">
@@ -652,17 +698,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="g-signin2" data-onsuccess="onSignIn"></div>
             </section>
         </div>
     </div>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1692.0.min.js">
     </script>
     <script src="script.js"></script>
-    <meta name="google-signin-client_id"
-        content="69084632352-49spqr03c869f4a1cf2ogqbpi598urar.apps.googleusercontent.com">
+
     <script>
+        let userName = 'Anonymous IV';
         document.addEventListener('DOMContentLoaded', function () {
             const compositionForm = document.getElementById('addCompositionForm');
             const compositionList = document.getElementById('compositionList');
@@ -676,7 +720,6 @@
 
             let compositions = [];
             let sortOrder = 'newest'; // Default sort order
-            let userName = 'Anonymous IV';
 
             // Tab navigation
             navTabs.forEach(tab => {
@@ -1128,15 +1171,18 @@
             function filterCompositions() {
                 renderCompositions();
             }
-
-            function onSignIn(googleUser) {
-                var profile = googleUser.getBasicProfile();
-                console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-                console.log('Name: ' + profile.getName());
-                console.log('Image URL: ' + profile.getImageUrl());
-                console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-            }
         });
+        function onSignIn(googleUser) {
+            const container = document.getElementById('signInContainer');
+            container.classList.remove('active');
+
+            var profile = googleUser.getBasicProfile();
+            console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+            console.log('Name: ' + profile.getName());
+            console.log('Image URL: ' + profile.getImageUrl());
+            console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+        }
+        //onSignIn();
     </script>
 </body>
 
