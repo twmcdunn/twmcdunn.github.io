@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="favicon.png" type="image/png">    <title>The Delight of Composition Landing Page</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <title>The Delight of Composition Landing Page</title>
     <style>
         :root {
             --primary: #5c6bc0;
@@ -706,7 +707,9 @@
     <script src="script.js"></script>
 
     <script>
-        let userName = 'Anonymous IV';
+        let usersName = 'Anonymous IV';
+        let usersImageURL = '';
+        let usersID = '';
         document.addEventListener('DOMContentLoaded', function () {
             const compositionForm = document.getElementById('addCompositionForm');
             const compositionList = document.getElementById('compositionList');
@@ -740,6 +743,9 @@
                     // If switching to compositions tab, refresh the composition list
                     if (tabId === 'compositions') {
                         loadCompositions();
+                    }
+                    else if (tabid = 'forum') {
+                        loadForum();
                     }
                 });
             });
@@ -1170,6 +1176,184 @@
 
             function filterCompositions() {
                 renderCompositions();
+            }
+
+            function loadForum() {
+
+            }
+
+            function createForumCard(forum) {
+                const card = document.createElement('div');
+                card.className = 'forum-card';
+                card.setAttribute('data-id', forum.ID.N || Math.random().toString(36).substr(2, 9));
+
+                // Create card content
+                const cardContent = document.createElement('div');
+                cardContent.className = 'card-content';
+
+                cardContent.innerHTML = `
+                    <div class="forum-content">
+                        <h3 class="forum-title">${forum.TITLE.S}</h3>
+                        <p class="card-author">A forum created by ${forum.AUTHOR.S}</p>
+                        <p class="forum-description">
+                            ${forum.DESCRIPTION.S}
+                        </p>
+                    </div>
+                `;
+
+                // Create comments section
+                const commentsSection = document.createElement('div');
+                commentsSection.className = 'comments-section';
+
+                const commentsToggle = document.createElement('div');
+                commentsToggle.className = 'comments-toggle';
+
+                /*
+                getComments(Number(composition.ID.N), (comments) => {
+                    var count = comments.length;
+                    commentsToggle.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                    <span>Comments</span>
+                    <span class="comments-count">${count}</span>
+                `;
+                });
+                */
+
+
+                var count = Number(forum.CURRENT_COMMENT_NUM.N);
+                commentsToggle.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                    <span>Comments</span>
+                    <span class="comments-count">${count}</span>
+                `;
+
+                const commentsContainer = document.createElement('div');
+                commentsContainer.className = 'comments-container';
+
+                const commentsList = document.createElement('div');
+                commentsList.className = 'comments-list';
+
+                const commentForm = document.createElement('div');
+                commentForm.className = 'comment-form';
+                commentForm.innerHTML = `
+                    <div class="form-group">
+                        <label for="commentText_${forum.ID.N}">Your Comment</label>
+                        <textarea id="commentText_${forum.ID.N}" placeholder="Share your thoughts on this composition..." required></textarea>
+                    </div>
+                    <button type="button" class="submit-comment" data-composition-id="${forum.ID.N}">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                        Post Comment
+                    </button>
+                `;
+
+                commentsContainer.appendChild(commentsList);
+                commentsContainer.appendChild(commentForm);
+
+                commentsSection.appendChild(commentsToggle);
+                commentsSection.appendChild(commentsContainer);
+
+                cardContent.appendChild(commentsSection);
+
+                card.appendChild(cardContent);
+
+                // Add event listeners for comments
+                commentsToggle.addEventListener('click', function () {
+                    const isOpen = commentsToggle.classList.contains('open');
+
+                    if (!isOpen) {
+                        // Load comments when opening for the first time
+                        loadForumComments(forum.ID.N, commentsList);
+                    }
+
+                    commentsToggle.classList.toggle('open');
+                    commentsContainer.classList.toggle('visible');
+                });
+
+                // Add event listener for comment submission
+                const submitButton = commentForm.querySelector('.submit-comment');
+                submitButton.addEventListener('click', function () {
+                    const commentInput = document.getElementById(`commentText_${composition.ID.N}`);
+
+                    const commentorName = usersName;
+                    const comment = commentInput.value.trim();
+
+                    if (!commentorName || !comment) {
+                        alert('Please fill in all fields... Do we not have your name on file?');
+                        return;
+                    }
+
+                    // Post the comment to the database
+                    postForumComment(forum.ID.N, usersID, comment, function () {
+
+                        // Clear form fields
+                        commentInput.value = '';
+
+                        // Reload comments
+                        loadForumComments(forum.ID.N, commentsList);
+                    });
+                });
+
+                return card;
+            }
+
+            function loadForumComments(forumID, commentsList) {
+                // Clear existing comments
+                commentsList.innerHTML = '';
+
+                // Get comments for this composition
+                getForumComments(forumID, function (comments) {
+
+
+                    // Update count
+                    const card = document.querySelector(`[data-id="${compositionId}"]`);
+                    if (card) {
+                        const countElement = card.querySelector('.comments-count');
+                        if (countElement) {
+                            countElement.textContent = comments.length;
+                        }
+                    }
+
+                    if (comments.length === 0) {
+                        commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
+                        return;
+                    }
+
+                    // Display comments
+                    comments.forEach(comment => {
+                        const commentElement = document.createElement('div');
+                        commentElement.className = 'comment';
+
+                        var date = '';
+                        if (!(comment.POST_DATE === undefined) && comment.POST_DATE.N) {
+                            date = new Date(comment.POST_DATE.N).toLocaleDateString();
+                            var secAgo = Date.now() - Number(comment.POST_DATE.N);
+                            if (secAgo < 1000 * 60 * 60 * 24) {
+                                date = 'Recently';
+                                if (secAgo > 1000 * 60 * 60) {
+                                    var hrs = secAgo / (1000 * 60 * 60);
+                                    date = 'About ' + hrs + ' ago';
+                                }
+                            }
+                        }
+
+                        commentElement.innerHTML = `
+                        <div class="comment-header">
+                            <span class="comment-author">${comment.COMMENTOR_NAME.S}:</span>
+                            <span class="comment-date">${date}</span>
+                        </div>
+                        <div class="comment-text">${comment.COMMENT_CONTENT.S}</div>
+                    `;
+
+                        commentsList.appendChild(commentElement);
+                    });
+                });
             }
         });
         function onSignIn(response) {
