@@ -369,7 +369,7 @@ function getForumComments(forumID, callback) {
         KeyConditionExpression: "ELEM = :val AND ID BETWEEN :forumidLower AND :forumid",
         ExpressionAttributeValues: {
             ":val": { S: "FORUM_COMMENT_ELEM" },
-            ":formid": { N: (Number(forumID) * 1000000) + "" },
+            ":forumid": { N: (Number(forumID) * 1000000) + "" },
             ":forumidLower": { N: ((Number(forumID) - 1) * 1000000) + "" },
         },
         ProjectionExpression: "COMMENTOR_ID, COMMENT_CONTENT, POST_DATE",
