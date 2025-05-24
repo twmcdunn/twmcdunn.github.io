@@ -692,7 +692,7 @@
                 <h2>The Delight of Composition Forum</h2>
                 <p style="margin-bottom: 1rem;">Discuss technique. Exchange ideas. Share the joy.</p>
             </section>
-            <div class="signin-grid active" id="signInContainer">
+            <div class="signin-grid active" id="signInContainer" style="display: none;">
                 <section class="signin-section">
                     <h3 class="signin-title">Sign In</h3>
                     <p class="signin-description">
@@ -809,6 +809,16 @@
                     // Show the corresponding tab content
                     const tabId = this.getAttribute('data-tab');
                     document.getElementById(`${tabId}-tab`).classList.add('active');
+
+                    // Hide Google sign-in unless forum tab is active
+                    const signInContainer = document.getElementById('signInContainer');
+                    if (signInContainer) {
+                        if (tabId === 'forum') {
+                            signInContainer.style.display = '';
+                        } else {
+                            signInContainer.style.display = 'none';
+                        }
+                    }
 
                     // If switching to compositions tab, refresh the composition list
                     if (tabId === 'compositions') {
