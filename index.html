@@ -814,7 +814,7 @@
                     if (tabId === 'compositions') {
                         loadCompositions();
                     }
-                    else if (tabid === 'forum') {
+                    else if (tabId === 'forum') {
                         loadForums();
                     }
                 });
@@ -939,20 +939,9 @@
             });
             */
 
-            // Search functionality
-            searchInput.addEventListener('input', function () {
-                filterCompositions();
-            });
 
-            // Sort functionality
-            sortButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    sortButtons.forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
-                    sortOrder = this.dataset.sort;
-                    renderCompositions();
-                });
-            });
+
+
 
             function loadCompositions() {
                 showLoader();
@@ -1414,11 +1403,7 @@
                         // Reload comments
                         loadForumComments(forum.ID.N, commentsList);
 
-                        // Update comment count
-                        const countElement = card.querySelector('.comments-count');
-                        if (countElement) {
-                            countElement.textContent = parseInt(countElement.textContent) + 1;
-                        }
+
                     });
                 });
 
@@ -1430,6 +1415,15 @@
                 commentsList.innerHTML = '';
 
                 getForumComments(forumID, function (comments) {
+                    // Always update comment count
+                    const card = document.querySelector(`[data-id="${forumID}"]`);
+                    if (card) {
+                        const countElement = card.querySelector('.comments-count');
+                        if (countElement) {
+                            countElement.textContent = comments.length;
+                        }
+                    }
+                    
                     if (comments.length === 0) {
                         commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
                         return;
@@ -1535,7 +1529,7 @@
                                 showForumAlert(forumSuccessAlert);
 
                                 // Optionally reload forums list if you have that functionality
-                                 loadForums();
+                                loadForums();
                             } else {
                                 forumErrorAlert.textContent = 'Failed to create forum. Please try again.';
                                 showForumAlert(forumErrorAlert);
