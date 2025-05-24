@@ -75,6 +75,63 @@ var ddb = new AWS.DynamoDB({ apiVersion: "2012-08-10" });
     });
 }
 
+function addForum(title, content, usersID){
+     var params = {
+        ExpressionAttributeValues: {
+            ":increment": { N: "1" }
+        },
+        Key: {
+            ELEM: {
+                S: "CURRENT_FORUM_NUM"
+            },
+            ID: {
+                N: "0"
+            }
+        },
+        UpdateExpression: "SET CURRENT_NUM = CURRENT_NUM - :increment",
+        TableName: "DCLP",
+        ReturnValues: "UPDATED_OLD"
+    };
+     ddb.updateItem(params, function (err, data) {
+        if (err) {
+            console.log("error", err);
+        }
+        else {
+            //console.log("CURRENT_EVENT_NUM UPDATED. OLD = ", data.Attributes.CURRENT_NUM.N);
+            //console.log(data.Attributes);
+            var forumNum = Number(data.Attributes.CURRENT_NUM.N) - 1;
+            var params = {
+                Item: {
+                    ELEM: {
+                        S: "FORUM_ELEM"
+                    },
+                    ID: {
+                        N: forumNum + ""
+                    },
+                    TITLE: {
+                        S: title + ""
+                    },
+                    USER_ID: {
+                        S: usersID + ""
+                    },
+                    CURRENT_COMMENT_NUM: {
+                        N: "0"
+                    }
+                },
+                TableName: "DCLP"
+            };
+             ddb.putItem(params, function (err, data) {
+                if (err) {
+                    console.log("error", err);
+                }
+                else{
+                    callback(true);
+                }
+            });
+        }
+    });
+}
+
 /*
 add forum needs to be implemented
 function addForum(link, title, author, callback) {
@@ -325,4 +382,24 @@ function getForumComments(forumID, callback) {
             callback(data.Items);
         }
     })
+}
+
+function getForums(callback) {
+    var params = {
+        KeyConditionExpression: "ELEM = :val",
+        ExpressionAttributeValues: {
+            ":val": { S: "FORUM_ELEM" }
+        },
+        ProjectionExpression: "ID, TITLE, AUTHOR, DESCRIPTION, CURRENT_COMMENT_NUM, CREATION_DATE",
+        TableName: "DCLP"
+    };
+
+    ddb.query(params, function (err, data) {
+        if (err) {
+            console.log("error", err);
+        } else {
+            console.log("FORUM DATA", data);
+            callback(data.Items);
+        }
+    });
 }

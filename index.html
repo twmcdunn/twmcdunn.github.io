@@ -559,6 +559,24 @@
             color: white;
             border-color: var(--primary);
         }
+
+        /* Additional styles for the textarea focus state */
+        #forumContent:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(92, 107, 192, 0.2);
+        }
+
+        /* Style for the form when user is not logged in */
+        #addForumSection[style*="display: none"] {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #addForumSection {
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
     </style>
 </head>
 
@@ -671,7 +689,7 @@
         </div>
         <div class="tab-content" id="forum-tab">
             <section>
-                <h2>"The Delight of Composition" Forum</h2>
+                <h2>The Delight of Composition Forum</h2>
                 <p style="margin-bottom: 1rem;">Discuss technique. Exchange ideas. Share the joy.</p>
             </section>
             <div class="signin-grid active" id="signInContainer">
@@ -688,7 +706,54 @@
                     <div class="g_id_signin" data-type="standard"></div>
                 </section>
             </div>
+            <section class="add-section" id="addForumSection" style="display: none;">
+                <h2>Create New Forum</h2>
+                <div class="alert alert-success" id="forumSuccessAlert">Forum created successfully!</div>
+                <div class="alert alert-error" id="forumErrorAlert">Please fill in all fields to create a forum.</div>
+
+                <form id="addForumForm">
+                    <div class="form-group">
+                        <label for="forumTitle">Forum Title</label>
+                        <input type="text" id="forumTitle" placeholder="Enter a descriptive title for your forum"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="forumContent">Forum Description</label>
+                        <textarea id="forumContent"
+                            placeholder="Describe what this forum is about and what kind of discussions you'd like to see..."
+                            style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: var(--radius); resize: vertical; min-height: 120px; font-family: inherit; font-size: 1rem; line-height: 1.5;"
+                            required></textarea>
+                    </div>
+
+                    <button type="submit" id="submitForumBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        Create Forum
+                    </button>
+                </form>
+            </section>
             <section>
+                <h2>Browse Forums</h2>
+
+                <div class="filter-bar">
+                    <div class="search-box">
+                        <span class="search-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </span>
+                        <input type="text" id="forumSearchInput" placeholder="Search forums...">
+                    </div>
+                </div>
+
+                <div class="loader-container">
+                    <div class="loader" id="forumLoader"></div>
+                </div>
                 <div class="forum-grid" id="forumList">
                     <div class="forum-card">
                         <div class="forum-content">
@@ -721,6 +786,11 @@
             const navTabs = document.querySelectorAll('.nav-tab');
             const tabContents = document.querySelectorAll('.tab-content');
 
+            const addForumForm = document.getElementById('addForumForm');
+            const addForumSection = document.getElementById('addForumSection');
+            const forumSuccessAlert = document.getElementById('forumSuccessAlert');
+            const forumErrorAlert = document.getElementById('forumErrorAlert');
+
             let compositions = [];
             let sortOrder = 'newest'; // Default sort order
 
@@ -745,7 +815,7 @@
                         loadCompositions();
                     }
                     else if (tabid = 'forum') {
-                        loadForum();
+                        loadForums();
                     }
                 });
             });
@@ -1178,8 +1248,56 @@
                 renderCompositions();
             }
 
-            function loadForum() {
+            // Forum search functionality
+            if (forumSearchInput) {
+                forumSearchInput.addEventListener('input', function () {
+                    filterForums();
+                });
+            }
 
+            function loadForums() {
+                showLoader(); // Reuse your existing loader
+
+                // Get forums from database - you need to implement getForums() on backend
+                getForums(function (forumData) {
+                    forums = forumData;
+                    hideLoader();
+                    renderForums();
+                });
+            }
+
+            function renderForums() {
+                // Filter forums based on search term
+                const searchTerm = forumSearchInput ? forumSearchInput.value.toLowerCase() : '';
+                const filteredForums = forums.filter(forum => {
+                    return forum.TITLE.S.toLowerCase().includes(searchTerm) ||
+                        forum.AUTHOR.S.toLowerCase().includes(searchTerm) ||
+                        forum.DESCRIPTION.S.toLowerCase().includes(searchTerm);
+                });
+
+                // Clear the list
+                forumList.innerHTML = '';
+
+                if (filteredForums.length === 0) {
+                    forumList.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">💬</div>
+                    <h3>No forums found</h3>
+                    <p>Be the first to create a discussion forum!</p>
+                </div>
+            `;
+                    return;
+                }
+
+                // Render each forum
+                filteredForums.forEach(forum => {
+                    const card = createForumCard(forum);
+                    forumList.appendChild(card);
+                });
+            }
+
+            function filterForums() {
+                renderForums();
             }
 
             function createForumCard(forum) {
@@ -1189,17 +1307,15 @@
 
                 // Create card content
                 const cardContent = document.createElement('div');
-                cardContent.className = 'card-content';
+                cardContent.className = 'forum-content';
 
                 cardContent.innerHTML = `
-                    <div class="forum-content">
-                        <h3 class="forum-title">${forum.TITLE.S}</h3>
-                        <p class="card-author">A forum created by ${forum.AUTHOR.S}</p>
-                        <p class="forum-description">
-                            ${forum.DESCRIPTION.S}
-                        </p>
-                    </div>
-                `;
+            <h3 class="forum-title">${forum.TITLE.S}</h3>
+            <p class="card-author">Created by ${forum.AUTHOR.S}</p>
+            <p class="forum-description">
+                ${forum.DESCRIPTION.S}
+            </p>
+        `;
 
                 // Create comments section
                 const commentsSection = document.createElement('div');
@@ -1208,28 +1324,14 @@
                 const commentsToggle = document.createElement('div');
                 commentsToggle.className = 'comments-toggle';
 
-                /*
-                getComments(Number(composition.ID.N), (comments) => {
-                    var count = comments.length;
-                    commentsToggle.innerHTML = `
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                    <span>Comments</span>
-                    <span class="comments-count">${count}</span>
-                `;
-                });
-                */
-
-
                 var count = Number(forum.CURRENT_COMMENT_NUM.N);
                 commentsToggle.innerHTML = `
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                    <span>Comments</span>
-                    <span class="comments-count">${count}</span>
-                `;
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <span>Comments</span>
+            <span class="comments-count">${count}</span>
+        `;
 
                 const commentsContainer = document.createElement('div');
                 commentsContainer.className = 'comments-container';
@@ -1240,18 +1342,18 @@
                 const commentForm = document.createElement('div');
                 commentForm.className = 'comment-form';
                 commentForm.innerHTML = `
-                    <div class="form-group">
-                        <label for="commentText_${forum.ID.N}">Your Comment</label>
-                        <textarea id="commentText_${forum.ID.N}" placeholder="Share your thoughts on this composition..." required></textarea>
-                    </div>
-                    <button type="button" class="submit-comment" data-composition-id="${forum.ID.N}">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                        Post Comment
-                    </button>
-                `;
+            <div class="form-group">
+                <label for="commentText_${forum.ID.N}">Your Comment</label>
+                <textarea id="commentText_${forum.ID.N}" placeholder="Share your thoughts on this topic..." required></textarea>
+            </div>
+            <button type="button" class="submit-comment" data-forum-id="${forum.ID.N}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+                Post Comment
+            </button>
+        `;
 
                 commentsContainer.appendChild(commentsList);
                 commentsContainer.appendChild(commentForm);
@@ -1260,7 +1362,6 @@
                 commentsSection.appendChild(commentsContainer);
 
                 cardContent.appendChild(commentsSection);
-
                 card.appendChild(cardContent);
 
                 // Add event listeners for comments
@@ -1279,7 +1380,7 @@
                 // Add event listener for comment submission
                 const submitButton = commentForm.querySelector('.submit-comment');
                 submitButton.addEventListener('click', function () {
-                    const commentInput = document.getElementById(`commentText_${composition.ID.N}`);
+                    const commentInput = document.getElementById(`commentText_${forum.ID.N}`);
 
                     const commentorName = usersName;
                     const comment = commentInput.value.trim();
@@ -1289,14 +1390,24 @@
                         return;
                     }
 
+                    if (!usersID) {
+                        alert('You must be logged in to comment.');
+                        return;
+                    }
+
                     // Post the comment to the database
                     postForumComment(forum.ID.N, usersID, comment, function () {
-
                         // Clear form fields
                         commentInput.value = '';
 
                         // Reload comments
                         loadForumComments(forum.ID.N, commentsList);
+
+                        // Update comment count
+                        const countElement = card.querySelector('.comments-count');
+                        if (countElement) {
+                            countElement.textContent = parseInt(countElement.textContent) + 1;
+                        }
                     });
                 });
 
@@ -1307,19 +1418,8 @@
                 // Clear existing comments
                 commentsList.innerHTML = '';
 
-                // Get comments for this composition
+                // Get comments for this forum - you need to implement getForumComments() on backend
                 getForumComments(forumID, function (comments) {
-
-
-                    // Update count
-                    const card = document.querySelector(`[data-id="${compositionId}"]`);
-                    if (card) {
-                        const countElement = card.querySelector('.comments-count');
-                        if (countElement) {
-                            countElement.textContent = comments.length;
-                        }
-                    }
-
                     if (comments.length === 0) {
                         commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
                         return;
@@ -1332,29 +1432,98 @@
 
                         var date = '';
                         if (!(comment.POST_DATE === undefined) && comment.POST_DATE.N) {
-                            date = new Date(comment.POST_DATE.N).toLocaleDateString();
+                            date = new Date(Number(comment.POST_DATE.N)).toLocaleDateString();
                             var secAgo = Date.now() - Number(comment.POST_DATE.N);
                             if (secAgo < 1000 * 60 * 60 * 24) {
                                 date = 'Recently';
                                 if (secAgo > 1000 * 60 * 60) {
-                                    var hrs = secAgo / (1000 * 60 * 60);
-                                    date = 'About ' + hrs + ' ago';
+                                    var hrs = Math.floor(secAgo / (1000 * 60 * 60));
+                                    date = `About ${hrs} hour${hrs > 1 ? 's' : ''} ago`;
                                 }
                             }
                         }
 
                         commentElement.innerHTML = `
-                        <div class="comment-header">
-                            <span class="comment-author">${comment.COMMENTOR_NAME.S}:</span>
-                            <span class="comment-date">${date}</span>
-                        </div>
-                        <div class="comment-text">${comment.COMMENT_CONTENT.S}</div>
-                    `;
+                    <div class="comment-header">
+                        <span class="comment-author">${comment.COMMENTOR_NAME.S}:</span>
+                        <span class="comment-date">${date}</span>
+                    </div>
+                    <div class="comment-text">${comment.COMMENT_CONTENT.S}</div>
+                `;
 
                         commentsList.appendChild(commentElement);
                     });
                 });
             }
+
+            // Show/hide the add forum section based on login status
+            function toggleForumCreation(isLoggedIn) {
+                if (isLoggedIn && usersID) {
+                    addForumSection.style.display = 'block';
+                } else {
+                    addForumSection.style.display = 'none';
+                }
+            }
+
+            if (addForumForm) {
+                addForumForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    const titleInput = document.getElementById('forumTitle');
+                    const contentInput = document.getElementById('forumContent');
+
+                    const title = titleInput.value.trim();
+                    const content = contentInput.value.trim();
+
+                    // Validation
+                    if (!title || !content) {
+                        showForumAlert(forumErrorAlert);
+                        return;
+                    }
+
+                    if (!usersID) {
+                        forumErrorAlert.textContent = 'You must be logged in to create a forum.';
+                        showForumAlert(forumErrorAlert);
+                        return;
+                    }
+
+                    // Call the backend function (assuming it exists)
+                    try {
+                        addForum(title, content, usersID, function (success) {
+                            if (success) {
+                                // Clear form
+                                titleInput.value = '';
+                                contentInput.value = '';
+
+                                // Show success message
+                                showForumAlert(forumSuccessAlert);
+
+                                // Optionally reload forums list if you have that functionality
+                                // loadForums();
+                            } else {
+                                forumErrorAlert.textContent = 'Failed to create forum. Please try again.';
+                                showForumAlert(forumErrorAlert);
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Error creating forum:', error);
+                        forumErrorAlert.textContent = 'An error occurred while creating the forum.';
+                        showForumAlert(forumErrorAlert);
+                    }
+                });
+            }
+
+            function showForumAlert(alertElement) {
+                alertElement.style.display = 'block';
+                setTimeout(() => {
+                    alertElement.style.display = 'none';
+                }, 3000);
+            }
+
+            // Expose the toggle function globally so it can be called from your login handler
+            window.toggleForumCreation = toggleForumCreation;
+
+            toggleForumCreation(true);
         });
         function onSignIn(response) {
             const container = document.getElementById('signInContainer');
@@ -1368,7 +1537,18 @@
             console.log("Image URL: " + responsePayload.picture);
             console.log("Email: " + responsePayload.email);
 
+            usersName = responsePayload.name;
+            usersImageURL = responsePayload.picture;
+            usersID = responsePayload.sub;
+
+            // Show forum creation section
+            if (window.toggleForumCreation) {
+                window.toggleForumCreation(true);
+            }
+
         }
+
+
 
         function decodeJwtResponse(token) {
             let base64Url = token.split('.')[1];
