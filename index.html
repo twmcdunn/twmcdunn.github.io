@@ -1423,7 +1423,7 @@
                             countElement.textContent = comments.length;
                         }
                     }
-                    
+
                     if (comments.length === 0) {
                         commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
                         return;
@@ -1570,6 +1570,17 @@
             usersName = responsePayload.name;
             usersImageURL = responsePayload.picture;
             usersID = responsePayload.sub;
+
+            // Only add user if they don't exist
+            getNameFromID(usersID, function (name) {
+                if (!name) {
+                    addUser(usersID, usersName, function (success) {
+                        if (!success) {
+                            console.error('Failed to add user record');
+                        }
+                    });
+                }
+            });
 
             // Show forum creation section
             if (window.toggleForumCreation) {
