@@ -1237,6 +1237,10 @@
                 renderCompositions();
             }
 
+            let forums = [];
+            const forumList = document.getElementById('forumList');
+            const forumSearchInput = document.getElementById('forumSearchInput');
+
             // Forum search functionality
             if (forumSearchInput) {
                 forumSearchInput.addEventListener('input', function () {
@@ -1244,9 +1248,6 @@
                 });
             }
 
-            let forums = [];
-            const forumList = document.getElementById('forumList');
-            const forumSearchInput = document.getElementById('forumSearchInput');
 
             function loadForums() {
                 showLoader();
