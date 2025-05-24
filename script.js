@@ -75,7 +75,7 @@ var ddb = new AWS.DynamoDB({ apiVersion: "2012-08-10" });
     });
 }
 
-function addForum(title, content, usersID){
+function addForum(title, content, usersID, callback){
      var params = {
         ExpressionAttributeValues: {
             ":increment": { N: "1" }
