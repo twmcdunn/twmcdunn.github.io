@@ -114,6 +114,9 @@ function addForum(title, content, usersID){
                     USER_ID: {
                         S: usersID + ""
                     },
+                    DESCRIPTION: {
+                        S: content + ""
+                    },
                     CURRENT_COMMENT_NUM: {
                         N: "0"
                     }
@@ -390,7 +393,7 @@ function getForums(callback) {
         ExpressionAttributeValues: {
             ":val": { S: "FORUM_ELEM" }
         },
-        ProjectionExpression: "ID, TITLE, AUTHOR, DESCRIPTION, CURRENT_COMMENT_NUM, CREATION_DATE",
+        ProjectionExpression: "ID, TITLE, USER_ID, DESCRIPTION, CURRENT_COMMENT_NUM, CREATION_DATE",
         TableName: "DCLP"
     };
 
@@ -400,6 +403,48 @@ function getForums(callback) {
         } else {
             console.log("FORUM DATA", data);
             callback(data.Items);
+        }
+    });
+}
+
+
+function addUser(userId, usersName, callback) {
+    var params = {
+        Item: {
+            USER_ID: { S: userId + "" },
+            USER_NAME: { S: usersName + "" }
+        },
+        TableName: "DCLP_USERS"
+    };
+    ddb.putItem(params, function (err, data) {
+        if (err) {
+            console.log("error", err);
+            callback(false);
+        } else {
+            callback(true);
+        }
+    });
+}
+
+// Get a user's name from their ID
+function getNameFromID(userID, callback) {
+    var params = {
+        Key: {
+            USER_ID: { S: userID + "" }
+        },
+        TableName: "DCLP_USERS",
+        ProjectionExpression: "USER_NAME"
+    };
+    ddb.getItem(params, function (err, data) {
+        if (err) {
+            console.log("error", err);
+            callback(null);
+        } else {
+            if (data.Item && data.Item.USER_NAME) {
+                callback(data.Item.USER_NAME.S);
+            } else {
+                callback(null);
+            }
         }
     });
 }

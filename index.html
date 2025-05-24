@@ -814,7 +814,7 @@
                     if (tabId === 'compositions') {
                         loadCompositions();
                     }
-                    else if (tabid = 'forum') {
+                    else if (tabid === 'forum') {
                         loadForums();
                     }
                 });
@@ -1174,7 +1174,7 @@
 
                         var date = '';
                         if (!(comment.POST_DATE === undefined) && comment.POST_DATE.N) {
-                            date = new Date(comment.POST_DATE.N).toLocaleDateString();
+                            date = new Date(Number(comment.POST_DATE.N)).toLocaleDateString();
                             var secAgo = Date.now() - Number(comment.POST_DATE.N);
                             if (secAgo < 1000 * 60 * 60 * 24) {
                                 date = 'Recently';
@@ -1255,49 +1255,61 @@
                 });
             }
 
-            function loadForums() {
-                showLoader(); // Reuse your existing loader
+            let forums = [];
+            const forumList = document.getElementById('forumList');
+            const forumSearchInput = document.getElementById('forumSearchInput');
 
-                // Get forums from database - you need to implement getForums() on backend
+            function loadForums() {
+                showLoader();
+
                 getForums(function (forumData) {
                     forums = forumData;
-                    hideLoader();
-                    renderForums();
+
+                    // For each forum, look up the author's name using USER_ID
+                    let pending = forums.length;
+                    if (pending === 0) {
+                        hideLoader();
+                        renderForums();
+                        return;
+                    }
+                    forums.forEach(forum => {
+                        getNameFromID(forum.USER_ID.S, function (name) {
+                            forum.AUTHOR_NAME = name || "Unknown";
+                            pending--;
+                            if (pending === 0) {
+                                hideLoader();
+                                renderForums();
+                            }
+                        });
+                    });
                 });
             }
 
             function renderForums() {
-                // Filter forums based on search term
                 const searchTerm = forumSearchInput ? forumSearchInput.value.toLowerCase() : '';
                 const filteredForums = forums.filter(forum => {
                     return forum.TITLE.S.toLowerCase().includes(searchTerm) ||
-                        forum.AUTHOR.S.toLowerCase().includes(searchTerm) ||
+                        (forum.AUTHOR_NAME && forum.AUTHOR_NAME.toLowerCase().includes(searchTerm)) ||
                         forum.DESCRIPTION.S.toLowerCase().includes(searchTerm);
                 });
 
-                // Clear the list
                 forumList.innerHTML = '';
 
                 if (filteredForums.length === 0) {
                     forumList.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">💬</div>
-                    <h3>No forums found</h3>
-                    <p>Be the first to create a discussion forum!</p>
-                </div>
-            `;
+            <div class="empty-state">
+                <div class="empty-icon">💬</div>
+                <h3>No forums found</h3>
+                <p>Be the first to create a discussion forum!</p>
+            </div>
+        `;
                     return;
                 }
 
-                // Render each forum
                 filteredForums.forEach(forum => {
                     const card = createForumCard(forum);
                     forumList.appendChild(card);
                 });
-            }
-
-            function filterForums() {
-                renderForums();
             }
 
             function createForumCard(forum) {
@@ -1305,17 +1317,16 @@
                 card.className = 'forum-card';
                 card.setAttribute('data-id', forum.ID.N || Math.random().toString(36).substr(2, 9));
 
-                // Create card content
                 const cardContent = document.createElement('div');
                 cardContent.className = 'forum-content';
 
                 cardContent.innerHTML = `
-            <h3 class="forum-title">${forum.TITLE.S}</h3>
-            <p class="card-author">Created by ${forum.AUTHOR.S}</p>
-            <p class="forum-description">
-                ${forum.DESCRIPTION.S}
-            </p>
-        `;
+        <h3 class="forum-title">${forum.TITLE.S}</h3>
+        <p class="card-author">Created by ${forum.AUTHOR_NAME || "Unknown"}</p>
+        <p class="forum-description">
+            ${forum.DESCRIPTION.S}
+        </p>
+    `;
 
                 // Create comments section
                 const commentsSection = document.createElement('div');
@@ -1418,41 +1429,66 @@
                 // Clear existing comments
                 commentsList.innerHTML = '';
 
-                // Get comments for this forum - you need to implement getForumComments() on backend
                 getForumComments(forumID, function (comments) {
                     if (comments.length === 0) {
                         commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
                         return;
                     }
 
-                    // Display comments
-                    comments.forEach(comment => {
-                        const commentElement = document.createElement('div');
-                        commentElement.className = 'comment';
+                    let pending = comments.length;
+                    let rendered = false; // Guard to ensure renderForumComments is called only once
 
-                        var date = '';
-                        if (!(comment.POST_DATE === undefined) && comment.POST_DATE.N) {
-                            date = new Date(Number(comment.POST_DATE.N)).toLocaleDateString();
-                            var secAgo = Date.now() - Number(comment.POST_DATE.N);
-                            if (secAgo < 1000 * 60 * 60 * 24) {
-                                date = 'Recently';
-                                if (secAgo > 1000 * 60 * 60) {
-                                    var hrs = Math.floor(secAgo / (1000 * 60 * 60));
-                                    date = `About ${hrs} hour${hrs > 1 ? 's' : ''} ago`;
-                                }
+                    function maybeRender() {
+                        if (!rendered && pending === 0) {
+                            rendered = true;
+                            renderForumComments(comments, commentsList);
+                        }
+                    }
+
+                    comments.forEach(comment => {
+                        if (comment.COMMENTOR_ID && comment.COMMENTOR_ID.S) {
+                            getNameFromID(comment.COMMENTOR_ID.S, function (resolvedName) {
+                                comment.COMMENTOR_NAME_RESOLVED = resolvedName || "Unknown";
+                                pending--;
+                                maybeRender();
+                            });
+                        } else {
+                            comment.COMMENTOR_NAME_RESOLVED = comment.COMMENTOR_NAME ? comment.COMMENTOR_NAME.S : "Unknown";
+                            pending--;
+                            maybeRender();
+                        }
+                    });
+                });
+            }
+
+            function renderForumComments(comments, commentsList) {
+                commentsList.innerHTML = '';
+                comments.forEach(comment => {
+                    const commentElement = document.createElement('div');
+                    commentElement.className = 'comment';
+
+                    var date = '';
+                    if (!(comment.POST_DATE === undefined) && comment.POST_DATE.N) {
+                        date = new Date(Number(comment.POST_DATE.N)).toLocaleDateString();
+                        var secAgo = Date.now() - Number(comment.POST_DATE.N);
+                        if (secAgo < 1000 * 60 * 60 * 24) {
+                            date = 'Recently';
+                            if (secAgo > 1000 * 60 * 60) {
+                                var hrs = Math.floor(secAgo / (1000 * 60 * 60));
+                                date = `About ${hrs} hour${hrs > 1 ? 's' : ''} ago`;
                             }
                         }
+                    }
 
-                        commentElement.innerHTML = `
-                    <div class="comment-header">
-                        <span class="comment-author">${comment.COMMENTOR_NAME.S}:</span>
-                        <span class="comment-date">${date}</span>
-                    </div>
-                    <div class="comment-text">${comment.COMMENT_CONTENT.S}</div>
-                `;
+                    commentElement.innerHTML = `
+            <div class="comment-header">
+                <span class="comment-author">${comment.COMMENTOR_NAME_RESOLVED}:</span>
+                <span class="comment-date">${date}</span>
+            </div>
+            <div class="comment-text">${comment.COMMENT_CONTENT.S}</div>
+        `;
 
-                        commentsList.appendChild(commentElement);
-                    });
+                    commentsList.appendChild(commentElement);
                 });
             }
 
@@ -1499,7 +1535,7 @@
                                 showForumAlert(forumSuccessAlert);
 
                                 // Optionally reload forums list if you have that functionality
-                                // loadForums();
+                                 loadForums();
                             } else {
                                 forumErrorAlert.textContent = 'Failed to create forum. Please try again.';
                                 showForumAlert(forumErrorAlert);
