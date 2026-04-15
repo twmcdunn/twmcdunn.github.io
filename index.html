@@ -5,152 +5,407 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="favicon.png" type="image/png">
-    <title>The Delight of Composition Landing Page</title>
+    <title>The Delight of Composition</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&display=swap');
+
         :root {
-            --primary: #5c6bc0;
-            --primary-light: #8e99f3;
-            --primary-dark: #26418f;
-            --secondary: #ff9800;
-            --text: #263238;
-            --background: #f5f7fa;
-            --card: #ffffff;
-            --accent: #ff5722;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --radius: 8px;
+            --background: #000000;
+            --foreground: #ededed;
+            --accent: #facc15;
+            --accent-dim: rgba(250, 204, 21, 0.1);
+            --accent-border: rgba(250, 204, 21, 0.4);
+            --blue-accent: #88CCFF;
+            --card-bg: rgba(28, 30, 44, 0.95);
+            --card-border: rgba(136, 204, 255, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --text-muted: #9ca3af;
+            --text-dim: #6b7280;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
             background-color: var(--background);
-            color: var(--text);
+            color: var(--foreground);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
-            padding-bottom: 5rem;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .background-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.2;
+        }
+
+        .glow-orb-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(136, 204, 255, 0.4) 0%, transparent 70%);
+            animation: float1 20s ease-in-out infinite;
+            left: 10%;
+            top: 10%;
+        }
+
+        .glow-orb-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(250, 204, 21, 0.4) 0%, transparent 70%);
+            animation: float2 25s ease-in-out infinite;
+            right: 15%;
+            top: 30%;
+        }
+
+        .glow-orb-3 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(136, 204, 255, 0.3) 0%, transparent 70%);
+            animation: float3 30s ease-in-out infinite;
+            left: 40%;
+            bottom: 10%;
+        }
+
+        @keyframes float1 {
+            0%, 100% { left: 10%; top: 10%; }
+            50% { left: 20%; top: 20%; }
+        }
+
+        @keyframes float2 {
+            0%, 100% { right: 15%; top: 30%; }
+            50% { right: 25%; top: 20%; }
+        }
+
+        @keyframes float3 {
+            0%, 100% { left: 40%; bottom: 10%; }
+            50% { left: 55%; bottom: 20%; }
         }
 
         header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 2rem 0;
+            position: relative;
+            z-index: 10;
             text-align: center;
-            box-shadow: var(--shadow);
+            padding: 3rem 1rem;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-
-        h1 {
-            font-size: 2.5rem;
+        header h1 {
+            font-size: 2rem;
+            font-weight: 200;
+            letter-spacing: 0.05em;
             margin-bottom: 0.5rem;
         }
 
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 1rem;
+        header .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
         }
 
-        .content {
-            margin-top: 2rem;
+        /* Depth-of-field entrance animation */
+        header {
+            opacity: 0;
+            filter: blur(20px);
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), 
+                        filter 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .add-section {
-            background-color: var(--card);
-            border-radius: var(--radius);
-            padding: 2rem;
-            box-shadow: var(--shadow);
+        header.loaded {
+            opacity: 1;
+            filter: blur(0);
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 10;
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+            width: 100%;
+            opacity: 0;
+            filter: blur(20px);
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.2s,
+                        filter 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.2s;
+        }
+
+        .main-content.loaded {
+            opacity: 1;
+            filter: blur(0);
+        }
+
+        .nav-tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 2rem;
+            gap: 0.5rem;
         }
 
-        h2 {
-            color: var(--primary-dark);
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-weight: 300;
+            color: var(--text-dim);
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-tab:hover {
+            color: var(--foreground);
+        }
+
+        .nav-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: linear-gradient(135deg, rgba(28, 30, 44, 0.95), rgba(0, 0, 0, 0.95));
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 300;
             margin-bottom: 1.5rem;
-            font-weight: 600;
+            color: var(--blue-accent);
         }
 
         .form-group {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.25rem;
         }
 
-        label {
+        .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            font-weight: 500;
+            font-weight: 300;
+            color: var(--text-muted);
+            font-size: 0.875rem;
         }
 
         input[type="text"],
-        input[type="url"] {
+        input[type="url"],
+        textarea {
             width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: var(--radius);
-            font-size: 1rem;
-            transition: border-color 0.3s;
+            padding: 0.875rem 1rem;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 0.5rem;
+            color: var(--foreground);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
         }
 
         input[type="text"]:focus,
-        input[type="url"]:focus {
-            border-color: var(--primary);
+        input[type="url"]:focus,
+        textarea:focus {
             outline: none;
-            box-shadow: 0 0 0 2px rgba(92, 107, 192, 0.2);
+            border-color: var(--accent-border);
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.1);
         }
 
-        button {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: var(--radius);
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
+        input::placeholder,
+        textarea::placeholder {
+            color: var(--text-dim);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .btn-primary {
+            position: relative;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-weight: 500;
+            padding: 0.875rem 2rem;
+            background: transparent;
+            color: var(--accent);
+            border: none;
+            cursor: pointer;
+            font-weight: 400;
+            font-size: 0.95rem;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
         }
 
-        button:hover {
-            background-color: var(--primary-dark);
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            padding: 2px;
+            background: linear-gradient(135deg, #ca8a04, var(--accent), #ca8a04);
+            border-radius: 0.5rem;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
         }
 
-        button:active {
+        .btn-primary:hover {
+            background: var(--accent-dim);
+        }
+
+        .btn-primary:active {
             transform: translateY(1px);
         }
 
-        button svg {
+        .btn-primary svg {
             margin-right: 0.5rem;
+        }
+
+        .btn-secondary {
+            padding: 0.875rem 2rem;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--foreground);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 300;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .search-box input {
+            padding-left: 2.75rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+            pointer-events: none;
+        }
+
+        .sort-options {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sort-options span {
+            color: var(--text-dim);
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+        }
+
+        .sort-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid var(--input-border);
+            color: var(--text-muted);
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 300;
+            transition: all 0.3s ease;
+        }
+
+        .sort-btn:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            color: var(--foreground);
+        }
+
+        .sort-btn.active {
+            background: var(--accent-dim);
+            border-color: var(--accent-border);
+            color: var(--accent);
         }
 
         .composition-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 1.5rem;
-            margin-top: 1rem;
         }
 
         .composition-card {
-            background-color: var(--card);
-            border-radius: var(--radius);
+            background: linear-gradient(135deg, rgba(28, 30, 44, 0.9), rgba(0, 0, 0, 0.9));
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 1rem;
             overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
         }
 
         .composition-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-4px);
+            border-color: rgba(136, 204, 255, 0.2);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
         }
 
         .embed-container {
@@ -158,7 +413,7 @@
             padding-bottom: 56.25%;
             height: 0;
             overflow: hidden;
-            background-color: #f0f0f0;
+            background: rgba(0, 0, 0, 0.5);
         }
 
         .embed-container iframe {
@@ -171,267 +426,214 @@
         }
 
         .card-content {
-            padding: 1.2rem;
+            padding: 1.25rem;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
         }
 
-        .card-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 0.3rem;
+        .card-title-text {
+            font-size: 1.1rem;
+            font-weight: 400;
+            margin-bottom: 0.25rem;
+            color: var(--foreground);
         }
 
         .card-author {
-            color: #666;
-            font-size: 0.95rem;
-            margin-bottom: 0.8rem;
+            color: var(--text-dim);
+            font-size: 0.875rem;
+            font-weight: 300;
+            margin-bottom: 0.75rem;
         }
 
         .card-link {
             margin-top: auto;
-            font-size: 0.9rem;
-            color: var(--primary);
+            font-size: 0.875rem;
+            color: var(--blue-accent);
             text-decoration: none;
             display: inline-flex;
             align-items: center;
+            transition: color 0.3s ease;
         }
 
         .card-link:hover {
-            text-decoration: underline;
+            color: var(--accent);
+        }
+
+        .card-link svg {
+            margin-left: 0.25rem;
         }
 
         .empty-state {
             text-align: center;
-            padding: 3rem;
-            background-color: var(--card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, rgba(28, 30, 44, 0.9), rgba(0, 0, 0, 0.9));
+            border: 1px solid var(--card-border);
+            border-radius: 1rem;
         }
 
         .empty-icon {
             font-size: 3rem;
-            color: #ccc;
             margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
         }
 
         .alert {
-            padding: 0.8rem 1rem;
-            border-radius: var(--radius);
+            padding: 0.875rem 1rem;
+            border-radius: 0.5rem;
             margin-bottom: 1rem;
+            font-size: 0.9rem;
+            font-weight: 300;
             display: none;
         }
 
         .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #4ade80;
         }
 
         .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        @media (max-width: 768px) {
-            .composition-list {
-                grid-template-columns: 1fr;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            .subtitle {
-                font-size: 1rem;
-            }
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
         }
 
         .loader-container {
             display: flex;
             justify-content: center;
-            margin: 2rem 0;
+            padding: 2rem;
         }
 
         .loader {
-            width: 48px;
-            height: 48px;
-            border: 5px solid var(--primary-light);
-            border-bottom-color: var(--primary);
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--input-border);
+            border-top-color: var(--accent);
             border-radius: 50%;
-            display: none;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
+            animation: spin 0.8s linear infinite;
         }
 
-        .nav-tabs {
-            display: flex;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 2rem;
-        }
-
-        .nav-tab {
-            padding: 1rem 1.5rem;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            color: #666;
-        }
-
-        .nav-tab:hover {
-            color: var(--primary);
-        }
-
-        .nav-tab.active {
-            color: var(--primary);
-        }
-
-        .nav-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background-color: var(--primary);
-            border-top-left-radius: 3px;
-            border-top-right-radius: 3px;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .tutorial-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 1.5rem;
         }
 
         .tutorial-card {
-            background-color: var(--card);
-            border-radius: var(--radius);
+            background: linear-gradient(135deg, rgba(28, 30, 44, 0.9), rgba(0, 0, 0, 0.9));
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 1rem;
             overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: all 0.3s ease;
         }
 
         .tutorial-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-4px);
+            border-color: rgba(136, 204, 255, 0.2);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
         }
 
         .tutorial-content {
-            padding: 1.2rem;
+            padding: 1.25rem;
         }
 
         .tutorial-title {
-            font-size: 1.2rem;
-            font-weight: 600;
+            font-size: 1.1rem;
+            font-weight: 400;
             margin-bottom: 0.5rem;
         }
 
         .tutorial-description {
-            color: #666;
-            font-size: 0.95rem;
-            margin-bottom: 1rem;
-        }
-
-        .signin-grid {
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            display: none;
-        }
-
-        .signin-grid.active {
-            display: grid;
-        }
-
-        .signin-section {
-            background-color: var(--card);
-            border-radius: var(--radius);
-            padding: 2rem;
-            box-shadow: var(--shadow);
-            margin-bottom: 2rem;
-        }
-
-        .signin-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .signin-description {
-            color: #666;
-            font-size: 0.95rem;
-            margin-bottom: 1rem;
-        }
-
-        .forum-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(min(600px, 100%), 1fr));
-            gap: 1.5rem;
+            color: var(--text-dim);
+            font-size: 0.875rem;
+            font-weight: 300;
+            line-height: 1.6;
         }
 
         .forum-card {
-            background-color: var(--card);
-            border-radius: var(--radius);
+            background: linear-gradient(135deg, rgba(28, 30, 44, 0.9), rgba(0, 0, 0, 0.9));
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 1rem;
             overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: all 0.3s ease;
         }
 
         .forum-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-4px);
+            border-color: rgba(136, 204, 255, 0.2);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
         }
 
         .forum-content {
-            padding: 1.2rem;
+            padding: 1.25rem;
         }
 
         .forum-title {
-            font-size: 1.2rem;
-            font-weight: 600;
+            font-size: 1.1rem;
+            font-weight: 400;
             margin-bottom: 0.5rem;
         }
 
-        .tutorial-description {
-            color: #666;
-            font-size: 0.95rem;
-            margin-bottom: 1rem;
+        .forum-description {
+            color: var(--text-dim);
+            font-size: 0.875rem;
+            font-weight: 300;
+            line-height: 1.6;
         }
 
         .comments-section {
-            margin-top: 1.5rem;
-            border-top: 1px solid #eee;
-            padding-top: 1.5rem;
+            margin-top: 1.25rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .comments-toggle {
             display: flex;
             align-items: center;
             cursor: pointer;
-            font-weight: 500;
-            color: var(--primary);
-            margin-bottom: 1rem;
+            font-weight: 300;
+            color: var(--blue-accent);
+            font-size: 0.875rem;
+            transition: color 0.3s ease;
+        }
+
+        .comments-toggle:hover {
+            color: var(--accent);
         }
 
         .comments-toggle svg {
             margin-right: 0.5rem;
-            transition: transform 0.3s;
+            transition: transform 0.3s ease;
         }
 
         .comments-toggle.open svg {
             transform: rotate(90deg);
+        }
+
+        .comments-count {
+            background: var(--accent-dim);
+            color: var(--accent);
+            border-radius: 10px;
+            padding: 0.125rem 0.5rem;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
         }
 
         .comments-container {
@@ -444,10 +646,10 @@
         }
 
         .comment {
-            background-color: #f9f9f9;
-            border-radius: var(--radius);
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 0.5rem;
             padding: 1rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
         }
 
         .comment-header {
@@ -457,187 +659,198 @@
         }
 
         .comment-author {
-            font-weight: 1000;
-            color: #26418f
+            font-weight: 500;
+            color: var(--blue-accent);
+            font-size: 0.875rem;
         }
 
         .comment-date {
-            font-size: 0.85rem;
-            color: #999;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .comment-text {
+            font-size: 0.875rem;
+            font-weight: 300;
+            color: var(--text-muted);
+            line-height: 1.5;
         }
 
         .comment-form {
-            margin-top: 1.5rem;
+            margin-top: 1rem;
         }
 
-        .comment-form textarea {
+        .comment-form .form-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .comment-form .btn-primary {
             width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: var(--radius);
-            resize: vertical;
-            min-height: 80px;
-            font-family: inherit;
-            font-size: 0.95rem;
-            margin-bottom: 1rem;
+            margin-top: 0.5rem;
         }
 
-        .comment-form textarea:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(92, 107, 192, 0.2);
+        .signin-section {
+            background: linear-gradient(135deg, rgba(28, 30, 44, 0.95), rgba(0, 0, 0, 0.95));
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
         }
 
-        .comments-count {
-            background-color: var(--primary-light);
-            color: white;
-            border-radius: 12px;
-            padding: 0.15rem 0.5rem;
-            font-size: 0.75rem;
-            margin-left: 0.5rem;
+        .signin-title {
+            font-size: 1.25rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
         }
 
-        @keyframes rotation {
-            0% {
-                transform: rotate(0deg);
+        .signin-description {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .composition-list,
+            .tutorial-grid,
+            .forum-grid {
+                grid-template-columns: 1fr;
             }
 
-            100% {
-                transform: rotate(360deg);
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            .nav-tab {
+                padding: 0.75rem 1rem;
+                font-size: 0.85rem;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .sort-options {
+                justify-content: center;
             }
         }
 
-        .filter-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-            gap: 1rem;
+        .forum-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
         }
 
-        .search-box {
-            flex: 1;
-            min-width: 200px;
-            position: relative;
-        }
-
-        .search-box input {
-            padding-left: 2.5rem;
-            width: 100%;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 0.8rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-        }
-
-        .sort-options {
-            display: flex;
-            align-items: center;
-        }
-
-        .sort-options span {
-            margin-right: 0.5rem;
-            white-space: nowrap;
-        }
-
-        .sort-btn {
-            background-color: transparent;
-            color: var(--text);
-            border: 1px solid #ddd;
-            padding: 0.5rem 0.8rem;
-            margin-left: 0.5rem;
-            border-radius: var(--radius);
-        }
-
-        .sort-btn.active {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        /* Additional styles for the textarea focus state */
-        #forumContent:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(92, 107, 192, 0.2);
-        }
-
-        /* Style for the form when user is not logged in */
-        #addForumSection[style*="display: none"] {
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        #addForumSection {
-            opacity: 1;
-            transition: opacity 0.3s ease;
+        @media (max-width: 500px) {
+            .forum-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 
 <body>
-    <header>
-        <div class="container">
+    <div class="app-container">
+        <div class="background-glow">
+            <div class="glow-orb glow-orb-1"></div>
+            <div class="glow-orb glow-orb-2"></div>
+            <div class="glow-orb glow-orb-3"></div>
+        </div>
+
+        <header>
             <h1>The Delight of Composition</h1>
             <p class="subtitle">Share compositions and exercises</p>
-        </div>
-    </header>
+        </header>
 
-    <div class="container content">
-        <div class="nav-tabs">
-            <div class="nav-tab active" data-tab="compositions">Compositions</div>
-            <div class="nav-tab" data-tab="tutorials">Tutorials</div>
-            <div class="nav-tab" data-tab="forum">Forum Preview</div>
-        </div>
+        <main class="main-content">
+            <div class="nav-tabs">
+                <div class="nav-tab active" data-tab="tutorials">Tutorials</div>
+                <div class="nav-tab" data-tab="compositions">Compositions</div>
+                <div class="nav-tab" data-tab="forum">Forum</div>
+            </div>
 
-        <div class="tab-content active" id="compositions-tab">
-            <section class="add-section">
-                <h2>Add Your Composition</h2>
-                <div class="alert alert-success" id="successAlert">Composition added successfully!</div>
-                <div class="alert alert-error" id="errorAlert">Please fill in all fields with valid information.</div>
+            <div class="tab-content active" id="tutorials-tab">
+                <div class="card" style="margin-bottom: 2rem;">
+                    <h2 class="card-title">Tutorial Series</h2>
+                    <p style="color: var(--text-dim); font-weight: 300; font-size: 0.95rem; line-height: 1.7;">
+                        Learn the art of musical composition and develop new techniques through my tutorial series on YouTube.
+                        Anyone can compose!
+                    </p>
+                </div>
 
-                <form id="addCompositionForm">
-                    <div class="form-group">
-                        <label for="compositionTitle">Composition Title</label>
-                        <input type="text" id="compositionTitle" placeholder="Enter the title of your composition"
-                            required>
+                <div class="tutorial-grid" id="tutorialList">
+                    <div class="tutorial-card">
+                        <div class="embed-container">
+                            <iframe src="https://www.youtube.com/embed/-_I8aE_hyd4?si=Fy_ONCpqewFjhxt6" allowfullscreen></iframe>
+                        </div>
+                        <div class="tutorial-content">
+                            <h3 class="tutorial-title">Set Multiplication</h3>
+                            <p class="tutorial-description">Explore a technique that produces an abundance of musical material from a very small initial idea.</p>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="composerName">Composer Name</label>
-                        <input type="text" id="composerName" placeholder="Enter your name" required>
+                    <div class="tutorial-card">
+                        <div class="embed-container">
+                            <iframe src="https://www.youtube.com/embed/j1uCb_hQVrQ" allowfullscreen></iframe>
+                        </div>
+                        <div class="tutorial-content">
+                            <h3 class="tutorial-title">Maximally Even Rhythms</h3>
+                            <p class="tutorial-description">Explore the mathematical principle behind groove. By distributing events as evenly as possible, we can generate rhythms found across world music traditions.</p>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="compositionLink">Embed Link</label>
-                        <input type="url" id="compositionLink"
-                            placeholder="Enter YouTube, SoundCloud, or other embed link" required>
+                    <div class="tutorial-card">
+                        <div class="embed-container">
+                            <iframe src="https://www.youtube.com/embed/9_EY3JERU2o" allowfullscreen></iframe>
+                        </div>
+                        <div class="tutorial-content">
+                            <h3 class="tutorial-title">Archinovica</h3>
+                            <p class="tutorial-description">A digital augmented instrument that retunes a MIDI keyboard during performance, enabling modulation within extended just intonation systems.</p>
+                        </div>
                     </div>
+                </div>
+            </div>
 
-                    <button type="submit" id="submitBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        Add Composition
-                    </button>
-                </form>
-            </section>
+            <div class="tab-content" id="compositions-tab">
+                <div class="card">
+                    <h2 class="card-title">Add Your Composition</h2>
+                    <div class="alert alert-success" id="successAlert">Composition added successfully!</div>
+                    <div class="alert alert-error" id="errorAlert">Please fill in all fields with valid information.</div>
 
-            <section>
-                <h2>Discover Compositions</h2>
+                    <form id="addCompositionForm">
+                        <div class="form-group">
+                            <label for="compositionTitle">Composition Title</label>
+                            <input type="text" id="compositionTitle" placeholder="Enter the title of your composition" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="composerName">Composer Name</label>
+                            <input type="text" id="composerName" placeholder="Enter your name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="compositionLink">Embed Link</label>
+                            <input type="url" id="compositionLink" placeholder="Enter YouTube, SoundCloud, or other embed link" required>
+                        </div>
+
+                        <button type="submit" class="btn-primary" id="submitBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Composition
+                        </button>
+                    </form>
+                </div>
+
+                <h2 style="font-size: 1.25rem; font-weight: 300; margin-bottom: 1.5rem;">Discover Compositions</h2>
 
                 <div class="filter-bar">
                     <div class="search-box">
                         <span class="search-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                             </svg>
@@ -656,93 +869,52 @@
                     <div class="loader" id="loader"></div>
                 </div>
 
-                <div id="compositionList" class="composition-list">
-                    <!-- Compositions will be loaded here -->
-                </div>
-            </section>
-        </div>
+                <div id="compositionList" class="composition-list"></div>
+            </div>
 
-        <div class="tab-content" id="tutorials-tab">
-            <section>
-                <h2>"The Delight of Composition" Tutorial Series</h2>
-                <p style="margin-bottom: 1rem;">Learn the art of musical composition and develop new techiques through
-                    my tutorial series on YouTube.
-                    Anyone can compose!</p>
-                <div class="tutorial-grid" id="tutorialList">
-                    <!-- Tutorial entries will be loaded here -->
-                    <div class="tutorial-card">
-                        <div class="embed-container">
-                            <iframe src="https://www.youtube.com/embed/-_I8aE_hyd4?si=Fy_ONCpqewFjhxt6"
-                                allowfullscreen></iframe>
-                        </div>
-                        <div class="tutorial-content">
-                            <h3 class="tutorial-title">Set Multiplication</h3>
-                            <p class="tutorial-description">In this tutorial we explore a technique called 'set
-                                multiplication'.
-                                This produces an abundance of musical material from a very small initial idea.</p>
-                        </div>
-                    </div>
-
-
-                </div>
-            </section>
-        </div>
-        <div class="tab-content" id="forum-tab">
-            <section>
-                <h2>The Delight of Composition Forum</h2>
-                <p style="margin-bottom: 1rem;">Discuss technique. Exchange ideas. Share the joy.</p>
-            </section>
-            <div class="signin-grid active" id="signInContainer" style="display: none;">
-                <section class="signin-section">
+            <div class="tab-content" id="forum-tab">
+                <div class="signin-section" id="signInContainer" style="display: none;">
                     <h3 class="signin-title">Sign In</h3>
-                    <p class="signin-description">
-                        Please sign in to contribute to the forum.
-                    </p>
+                    <p class="signin-description">Please sign in to contribute to the forum.</p>
                     <script src="https://accounts.google.com/gsi/client" async defer></script>
                     <div id="g_id_onload"
                         data-client_id="69084632352-49spqr03c869f4a1cf2ogqbpi598urar.apps.googleusercontent.com"
                         data-callback="onSignIn">
                     </div>
                     <div class="g_id_signin" data-type="standard"></div>
-                </section>
-            </div>
-            <section class="add-section" id="addForumSection" style="display: none;">
-                <h2>Create New Forum</h2>
-                <div class="alert alert-success" id="forumSuccessAlert">Forum created successfully!</div>
-                <div class="alert alert-error" id="forumErrorAlert">Please fill in all fields to create a forum.</div>
+                </div>
 
-                <form id="addForumForm">
-                    <div class="form-group">
-                        <label for="forumTitle">Forum Title</label>
-                        <input type="text" id="forumTitle" placeholder="Enter a descriptive title for your forum"
-                            required>
-                    </div>
+                <div class="card" id="addForumSection" style="display: none;">
+                    <h2 class="card-title">Create New Forum</h2>
+                    <div class="alert alert-success" id="forumSuccessAlert">Forum created successfully!</div>
+                    <div class="alert alert-error" id="forumErrorAlert">Please fill in all fields to create a forum.</div>
 
-                    <div class="form-group">
-                        <label for="forumContent">Forum Description</label>
-                        <textarea id="forumContent"
-                            placeholder="Describe what this forum is about and what kind of discussions you'd like to see..."
-                            style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: var(--radius); resize: vertical; min-height: 120px; font-family: inherit; font-size: 1rem; line-height: 1.5;"
-                            required></textarea>
-                    </div>
+                    <form id="addForumForm">
+                        <div class="form-group">
+                            <label for="forumTitle">Forum Title</label>
+                            <input type="text" id="forumTitle" placeholder="Enter a descriptive title for your forum" required>
+                        </div>
 
-                    <button type="submit" id="submitForumBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                        </svg>
-                        Create Forum
-                    </button>
-                </form>
-            </section>
-            <section>
-                <h2>Browse Forums</h2>
+                        <div class="form-group">
+                            <label for="forumContent">Forum Description</label>
+                            <textarea id="forumContent" placeholder="Describe what this forum is about and what kind of discussions you'd like to see..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-primary" id="submitForumBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            Create Forum
+                        </button>
+                    </form>
+                </div>
+
+                <h2 style="font-size: 1.25rem; font-weight: 300; margin-bottom: 1.5rem;">Browse Forums</h2>
 
                 <div class="filter-bar">
                     <div class="search-box">
                         <span class="search-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                             </svg>
@@ -754,21 +926,20 @@
                 <div class="loader-container">
                     <div class="loader" id="forumLoader"></div>
                 </div>
+
                 <div class="forum-grid" id="forumList">
                     <div class="forum-card">
                         <div class="forum-content">
                             <h3 class="forum-title">Sample Forum</h3>
-                            <p class="forum-description">
-                                This forum is about the usefulness of microwaves for musical innovation.
-                            </p>
+                            <p class="forum-description">This forum is about the usefulness of microwaves for musical innovation.</p>
                         </div>
                     </div>
                 </div>
-            </section>
-        </div>
+            </div>
+        </main>
     </div>
-    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1692.0.min.js">
-    </script>
+
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1692.0.min.js"></script>
     <script src="script.js"></script>
 
     <script>
@@ -792,48 +963,37 @@
             const forumErrorAlert = document.getElementById('forumErrorAlert');
 
             let compositions = [];
-            let sortOrder = 'newest'; // Default sort order
+            let sortOrder = 'newest';
 
-            // Tab navigation
             navTabs.forEach(tab => {
                 tab.addEventListener('click', function () {
-                    // Remove active class from all tabs
                     navTabs.forEach(t => t.classList.remove('active'));
-
-                    // Add active class to clicked tab
                     this.classList.add('active');
 
-                    // Hide all tab contents
                     tabContents.forEach(content => content.classList.remove('active'));
 
-                    // Show the corresponding tab content
                     const tabId = this.getAttribute('data-tab');
-                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                    document.getElementById(tabId + '-tab').classList.add('active');
 
-                    // Hide Google sign-in unless forum tab is active
                     const signInContainer = document.getElementById('signInContainer');
                     if (signInContainer) {
-                        if (tabId === 'forum') {
-                            signInContainer.style.display = '';
-                        } else {
-                            signInContainer.style.display = 'none';
-                        }
+                        signInContainer.style.display = tabId === 'forum' ? '' : 'none';
                     }
 
-                    // If switching to compositions tab, refresh the composition list
                     if (tabId === 'compositions') {
                         loadCompositions();
-                    }
-                    else if (tabId === 'forum') {
+                    } else if (tabId === 'forum') {
                         loadForums();
                     }
                 });
             });
 
-            // Load compositions when page loads
-            loadCompositions();
+            // Trigger entrance animation on load
+            requestAnimationFrame(() => {
+                document.querySelector('.main-content').classList.add('loaded');
+                document.querySelector('header').classList.add('loaded');
+            });
 
-            // Form submission
             compositionForm.addEventListener('submit', function (e) {
                 e.preventDefault();
 
@@ -850,31 +1010,19 @@
                     return;
                 }
 
-                // Generate a unique ID for the composition if not present
-                const id = Math.random().toString(36).substr(2, 9);
-
-                // Add composition to database with an ID property
                 addLink(link, title, author, function () {
-
-                    // Clear form
                     titleInput.value = '';
                     authorInput.value = '';
                     linkInput.value = '';
-
-                    // Show success message
                     showAlert(successAlert);
-
-                    // Reload compositions
                     loadCompositions();
                 });
             });
 
-            // Search functionality
             searchInput.addEventListener('input', function () {
-                filterCompositions();
+                renderCompositions();
             });
 
-            // Sort functionality
             sortButtons.forEach(button => {
                 button.addEventListener('click', function () {
                     sortButtons.forEach(btn => btn.classList.remove('active'));
@@ -885,78 +1033,7 @@
             });
 
             function loadCompositions() {
-                getLinks(loadCompositions1);
-            }
-
-            function loadCompositions1(compositions) {
                 showLoader();
-
-                // Get compositions from database
-                //compositions = getLinks() || [];
-
-                // Ensure each composition has an id
-                compositions.forEach(comp => {
-                    if (!comp.ID.N) {
-                        comp.ID.N = Math.random().toString(36).substr(2, 9);
-                    }
-                });
-
-                hideLoader();
-                renderCompositions();
-            }
-            //Alert = document.getElementById('errorAlert');
-            //const loaderElem = document.getElementById('loader');
-            //const searchInput = document.getElementById('searchInput');
-            //const sortButtons = document.querySelectorAll('.sort-btn');
-
-            //let compositions = [];
-            //let sortOrder = 'newest'; // Default sort order
-
-            // Load compositions when page loads
-            loadCompositions();
-
-            /*
-            // Form submission
-            compositionForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-
-                const titleInput = document.getElementById('compositionTitle');
-                const authorInput = document.getElementById('composerName');
-                const linkInput = document.getElementById('compositionLink');
-
-                const title = titleInput.value.trim();
-                const author = authorInput.value.trim();
-                const link = linkInput.value.trim();
-
-                if (!title || !author || !link) {
-                    showAlert(errorAlert);
-                    return;
-                }
-
-                // Add composition to database
-                addLink(link, title, author);
-
-                // Clear form
-                titleInput.value = '';
-                authorInput.value = '';
-                linkInput.value = '';
-
-                // Show success message
-                showAlert(successAlert);
-
-                // Reload compositions
-                loadCompositions();
-            });
-            */
-
-
-
-
-
-            function loadCompositions() {
-                showLoader();
-
-                // Get compositions from database
                 getLinks(function (comps) {
                     compositions = comps;
                     hideLoader();
@@ -965,36 +1042,24 @@
             }
 
             function renderCompositions() {
-                // Sort compositions based on current sort order
                 const sortedCompositions = [...compositions];
-                if (sortOrder === 'newest') {
-                    // Already in newest-first order from getLinks()
-                } else if (sortOrder === 'oldest') {
+                if (sortOrder === 'oldest') {
                     sortedCompositions.reverse();
                 }
 
-                // Filter compositions based on search term
                 const searchTerm = searchInput.value.toLowerCase();
                 const filteredCompositions = sortedCompositions.filter(comp => {
                     return comp.TITLE.S.toLowerCase().includes(searchTerm) ||
                         comp.AUTHOR.S.toLowerCase().includes(searchTerm);
                 });
 
-                // Clear the list
                 compositionList.innerHTML = '';
 
                 if (filteredCompositions.length === 0) {
-                    compositionList.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">🎵</div>
-                            <h3>No compositions found</h3>
-                            <p>Be the first to share your musical creation!</p>
-                        </div>
-                    `;
+                    compositionList.innerHTML = '<div class="empty-state"><div class="empty-icon">&#127925;</div><h3>No compositions found</h3><p>Be the first to share your musical creation!</p></div>';
                     return;
                 }
 
-                // Render each composition
                 filteredCompositions.forEach(comp => {
                     const card = createCompositionCard(comp);
                     compositionList.appendChild(card);
@@ -1006,11 +1071,9 @@
                 card.className = 'composition-card';
                 card.setAttribute('data-id', composition.ID.N || Math.random().toString(36).substr(2, 9));
 
-                // Create embed container
                 const embedContainer = document.createElement('div');
                 embedContainer.className = 'embed-container';
 
-                // Create iframe for embed (this handles YouTube, SoundCloud, etc.)
                 const iframe = document.createElement('iframe');
                 iframe.src = getEmbedUrl(composition.COMP_URL.S);
                 iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
@@ -1018,52 +1081,19 @@
 
                 embedContainer.appendChild(iframe);
 
-                // Create card content
                 const cardContent = document.createElement('div');
                 cardContent.className = 'card-content';
 
-                cardContent.innerHTML = `
-                    <h3 class="card-title">${composition.TITLE.S}</h3>
-                    <p class="card-author">By ${composition.AUTHOR.S}</p>
-                    <a href="${composition.COMP_URL.S}" target="_blank" class="card-link">
-                        Open original
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 4px;">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                            <polyline points="15 3 21 3 21 9"></polyline>
-                            <line x1="10" y1="14" x2="21" y2="3"></line>
-                        </svg>
-                    </a>
-                `;
+                cardContent.innerHTML = '<h3 class="card-title-text">' + composition.TITLE.S + '</h3><p class="card-author">By ' + composition.AUTHOR.S + '</p><a href="' + composition.COMP_URL.S + '" target="_blank" class="card-link">Open original<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>';
 
-                // Create comments section
                 const commentsSection = document.createElement('div');
                 commentsSection.className = 'comments-section';
 
                 const commentsToggle = document.createElement('div');
                 commentsToggle.className = 'comments-toggle';
 
-                /*
-                getComments(Number(composition.ID.N), (comments) => {
-                    var count = comments.length;
-                    commentsToggle.innerHTML = `
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                    <span>Comments</span>
-                    <span class="comments-count">${count}</span>
-                `;
-                });
-                */
-
-
                 var count = Number(composition.CURRENT_COMMENT_NUM.N);
-                commentsToggle.innerHTML = `
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                    <span>Comments</span>
-                    <span class="comments-count">${count}</span>
-                `;
+                commentsToggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg><span>Comments</span><span class="comments-count">' + count + '</span>';
 
                 const commentsContainer = document.createElement('div');
                 commentsContainer.className = 'comments-container';
@@ -1073,23 +1103,7 @@
 
                 const commentForm = document.createElement('div');
                 commentForm.className = 'comment-form';
-                commentForm.innerHTML = `
-                    <div class="form-group">
-                        <label for="commentName_${composition.ID.N}">Your Name</label>
-                        <input type="text" id="commentName_${composition.ID.N}" placeholder="Enter your name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="commentText_${composition.ID.N}">Your Comment</label>
-                        <textarea id="commentText_${composition.ID.N}" placeholder="Share your thoughts on this composition..." required></textarea>
-                    </div>
-                    <button type="button" class="submit-comment" data-composition-id="${composition.ID.N}">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                        Post Comment
-                    </button>
-                `;
+                commentForm.innerHTML = '<div class="form-group"><label for="commentName_' + composition.ID.N + '">Your Name</label><input type="text" id="commentName_' + composition.ID.N + '" placeholder="Enter your name" required></div><div class="form-group"><label for="commentText_' + composition.ID.N + '">Your Comment</label><textarea id="commentText_' + composition.ID.N + '" placeholder="Share your thoughts on this composition..." required></textarea></div><button type="button" class="btn-primary submit-comment" data-composition-id="' + composition.ID.N + '"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>Post Comment</button>';
 
                 commentsContainer.appendChild(commentsList);
                 commentsContainer.appendChild(commentForm);
@@ -1102,24 +1116,19 @@
                 card.appendChild(embedContainer);
                 card.appendChild(cardContent);
 
-                // Add event listeners for comments
                 commentsToggle.addEventListener('click', function () {
                     const isOpen = commentsToggle.classList.contains('open');
-
                     if (!isOpen) {
-                        // Load comments when opening for the first time
                         loadComments(composition.ID.N, commentsList);
                     }
-
                     commentsToggle.classList.toggle('open');
                     commentsContainer.classList.toggle('visible');
                 });
 
-                // Add event listener for comment submission
                 const submitButton = commentForm.querySelector('.submit-comment');
                 submitButton.addEventListener('click', function () {
-                    const nameInput = document.getElementById(`commentName_${composition.ID.N}`);
-                    const commentInput = document.getElementById(`commentText_${composition.ID.N}`);
+                    const nameInput = document.getElementById('commentName_' + composition.ID.N);
+                    const commentInput = document.getElementById('commentText_' + composition.ID.N);
 
                     const commentorName = nameInput.value.trim();
                     const comment = commentInput.value.trim();
@@ -1129,14 +1138,9 @@
                         return;
                     }
 
-                    // Post the comment to the database
                     postComment(composition.ID.N, commentorName, comment, function () {
-
-                        // Clear form fields
                         nameInput.value = '';
                         commentInput.value = '';
-
-                        // Reload comments
                         loadComments(composition.ID.N, commentsList);
                     });
                 });
@@ -1145,15 +1149,10 @@
             }
 
             function loadComments(compositionId, commentsList) {
-                // Clear existing comments
                 commentsList.innerHTML = '';
 
-                // Get comments for this composition
                 getComments(compositionId, function (comments) {
-
-
-                    // Update count
-                    const card = document.querySelector(`[data-id="${compositionId}"]`);
+                    const card = document.querySelector('[data-id="' + compositionId + '"]');
                     if (card) {
                         const countElement = card.querySelector('.comments-count');
                         if (countElement) {
@@ -1162,11 +1161,10 @@
                     }
 
                     if (comments.length === 0) {
-                        commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
+                        commentsList.innerHTML = '<p style="color: var(--text-dim); font-size: 0.875rem;">No comments yet. Be the first to comment!</p>';
                         return;
                     }
 
-                    // Display comments
                     comments.forEach(comment => {
                         const commentElement = document.createElement('div');
                         commentElement.className = 'comment';
@@ -1178,19 +1176,13 @@
                             if (secAgo < 1000 * 60 * 60 * 24) {
                                 date = 'Recently';
                                 if (secAgo > 1000 * 60 * 60) {
-                                    var hrs = secAgo / (1000 * 60 * 60);
+                                    var hrs = Math.floor(secAgo / (1000 * 60 * 60));
                                     date = 'About ' + hrs + ' ago';
                                 }
                             }
                         }
 
-                        commentElement.innerHTML = `
-                        <div class="comment-header">
-                            <span class="comment-author">${comment.COMMENTOR_NAME.S}:</span>
-                            <span class="comment-date">${date}</span>
-                        </div>
-                        <div class="comment-text">${comment.COMMENT_CONTENT.S}</div>
-                    `;
+                        commentElement.innerHTML = '<div class="comment-header"><span class="comment-author">' + comment.COMMENTOR_NAME.S + ':</span><span class="comment-date">' + date + '</span></div><div class="comment-text">' + comment.COMMENT_CONTENT.S + '</div>';
 
                         commentsList.appendChild(commentElement);
                     });
@@ -1198,26 +1190,18 @@
             }
 
             function getEmbedUrl(url) {
-                // Handle YouTube links
                 if (url.includes('youtube.com') || url.includes('youtu.be')) {
                     const videoId = extractYouTubeId(url);
                     if (videoId) {
-                        return `https://www.youtube.com/embed/${videoId}`;
+                        return 'https://www.youtube.com/embed/' + videoId;
                     }
                 }
-
-                // Handle SoundCloud links
                 if (url.includes('soundcloud.com')) {
-                    return `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true`;
+                    return 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(url) + '&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true';
                 }
-
-                // Handle Spotify links
                 if (url.includes('spotify.com')) {
-                    // Convert spotify.com URLs to embed URLs
                     return url.replace('spotify.com', 'spotify.com/embed');
                 }
-
-                // For other links, try to use as is if they're already embed links
                 return url;
             }
 
@@ -1229,35 +1213,28 @@
 
             function showAlert(alertElement) {
                 alertElement.style.display = 'block';
-
-                setTimeout(() => {
+                setTimeout(function () {
                     alertElement.style.display = 'none';
                 }, 3000);
             }
 
             function showLoader() {
-                loader.style.display = 'inline-block';
+                loader.style.display = 'flex';
             }
 
             function hideLoader() {
                 loader.style.display = 'none';
             }
 
-            function filterCompositions() {
-                renderCompositions();
-            }
-
             let forums = [];
             const forumList = document.getElementById('forumList');
             const forumSearchInput = document.getElementById('forumSearchInput');
 
-            // Forum search functionality
             if (forumSearchInput) {
                 forumSearchInput.addEventListener('input', function () {
                     filterForums();
                 });
             }
-
 
             function loadForums() {
                 showLoader();
@@ -1265,16 +1242,15 @@
                 getForums(function (forumData) {
                     forums = forumData;
 
-                    // For each forum, look up the author's name using USER_ID
                     let pending = forums.length;
                     if (pending === 0) {
                         hideLoader();
                         renderForums();
                         return;
                     }
-                    forums.forEach(forum => {
+                    forums.forEach(function (forum) {
                         getNameFromID(forum.USER_ID.S, function (name) {
-                            forum.AUTHOR_NAME = name || "Unknown";
+                            forum.AUTHOR_NAME = name || 'Unknown';
                             pending--;
                             if (pending === 0) {
                                 hideLoader();
@@ -1287,7 +1263,7 @@
 
             function renderForums() {
                 const searchTerm = forumSearchInput ? forumSearchInput.value.toLowerCase() : '';
-                const filteredForums = forums.filter(forum => {
+                const filteredForums = forums.filter(function (forum) {
                     return forum.TITLE.S.toLowerCase().includes(searchTerm) ||
                         (forum.AUTHOR_NAME && forum.AUTHOR_NAME.toLowerCase().includes(searchTerm)) ||
                         forum.DESCRIPTION.S.toLowerCase().includes(searchTerm);
@@ -1296,17 +1272,11 @@
                 forumList.innerHTML = '';
 
                 if (filteredForums.length === 0) {
-                    forumList.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">💬</div>
-                <h3>No forums found</h3>
-                <p>Be the first to create a discussion forum!</p>
-            </div>
-        `;
+                    forumList.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128172;</div><h3>No forums found</h3><p>Be the first to create a discussion forum!</p></div>';
                     return;
                 }
 
-                filteredForums.forEach(forum => {
+                filteredForums.forEach(function (forum) {
                     const card = createForumCard(forum);
                     forumList.appendChild(card);
                 });
@@ -1320,15 +1290,8 @@
                 const cardContent = document.createElement('div');
                 cardContent.className = 'forum-content';
 
-                cardContent.innerHTML = `
-        <h3 class="forum-title">${forum.TITLE.S}</h3>
-        <p class="card-author">Created by ${forum.AUTHOR_NAME || "Unknown"}</p>
-        <p class="forum-description">
-            ${forum.DESCRIPTION.S}
-        </p>
-    `;
+                cardContent.innerHTML = '<h3 class="forum-title">' + forum.TITLE.S + '</h3><p class="card-author" style="color: var(--text-dim); font-size: 0.875rem; margin-bottom: 0.75rem;">Created by ' + (forum.AUTHOR_NAME || 'Unknown') + '</p><p class="forum-description">' + forum.DESCRIPTION.S + '</p>';
 
-                // Create comments section
                 const commentsSection = document.createElement('div');
                 commentsSection.className = 'comments-section';
 
@@ -1336,13 +1299,7 @@
                 commentsToggle.className = 'comments-toggle';
 
                 var count = Number(forum.CURRENT_COMMENT_NUM.N);
-                commentsToggle.innerHTML = `
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-            <span>Comments</span>
-            <span class="comments-count">${count}</span>
-        `;
+                commentsToggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg><span>Comments</span><span class="comments-count">' + count + '</span>';
 
                 const commentsContainer = document.createElement('div');
                 commentsContainer.className = 'comments-container';
@@ -1352,19 +1309,7 @@
 
                 const commentForm = document.createElement('div');
                 commentForm.className = 'comment-form';
-                commentForm.innerHTML = `
-            <div class="form-group">
-                <label for="commentText_${forum.ID.N}">Your Comment</label>
-                <textarea id="commentText_${forum.ID.N}" placeholder="Share your thoughts on this topic..." required></textarea>
-            </div>
-            <button type="button" class="submit-comment" data-forum-id="${forum.ID.N}">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-                Post Comment
-            </button>
-        `;
+                commentForm.innerHTML = '<div class="form-group"><label for="commentText_' + forum.ID.N + '">Your Comment</label><textarea id="commentText_' + forum.ID.N + '" placeholder="Share your thoughts on this topic..." required></textarea></div><button type="button" class="btn-primary submit-comment" data-forum-id="' + forum.ID.N + '"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>Post Comment</button>';
 
                 commentsContainer.appendChild(commentsList);
                 commentsContainer.appendChild(commentForm);
@@ -1375,23 +1320,18 @@
                 cardContent.appendChild(commentsSection);
                 card.appendChild(cardContent);
 
-                // Add event listeners for comments
                 commentsToggle.addEventListener('click', function () {
                     const isOpen = commentsToggle.classList.contains('open');
-
                     if (!isOpen) {
-                        // Load comments when opening for the first time
                         loadForumComments(forum.ID.N, commentsList);
                     }
-
                     commentsToggle.classList.toggle('open');
                     commentsContainer.classList.toggle('visible');
                 });
 
-                // Add event listener for comment submission
                 const submitButton = commentForm.querySelector('.submit-comment');
                 submitButton.addEventListener('click', function () {
-                    const commentInput = document.getElementById(`commentText_${forum.ID.N}`);
+                    const commentInput = document.getElementById('commentText_' + forum.ID.N);
 
                     const commentorName = usersName;
                     const comment = commentInput.value.trim();
@@ -1406,15 +1346,9 @@
                         return;
                     }
 
-                    // Post the comment to the database
                     postForumComment(forum.ID.N, usersID, comment, function () {
-                        // Clear form fields
                         commentInput.value = '';
-
-                        // Reload comments
                         loadForumComments(forum.ID.N, commentsList);
-
-
                     });
                 });
 
@@ -1422,12 +1356,10 @@
             }
 
             function loadForumComments(forumID, commentsList) {
-                // Clear existing comments
                 commentsList.innerHTML = '';
 
                 getForumComments(forumID, function (comments) {
-                    // Always update comment count
-                    const card = document.querySelector(`[data-id="${forumID}"]`);
+                    const card = document.querySelector('[data-id="' + forumID + '"]');
                     if (card) {
                         const countElement = card.querySelector('.comments-count');
                         if (countElement) {
@@ -1436,182 +1368,80 @@
                     }
 
                     if (comments.length === 0) {
-                        commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
+                        commentsList.innerHTML = '<p style="color: var(--text-dim); font-size: 0.875rem;">No comments yet. Be the first to comment!</p>';
                         return;
                     }
 
-                    let pending = comments.length;
-                    let rendered = false; // Guard to ensure renderForumComments is called only once
-
-                    function maybeRender() {
-                        if (!rendered && pending === 0) {
-                            rendered = true;
-                            renderForumComments(comments, commentsList);
-                        }
-                    }
-
-                    comments.forEach(comment => {
-                        if (comment.COMMENTOR_ID && comment.COMMENTOR_ID.S) {
-                            getNameFromID(comment.COMMENTOR_ID.S, function (resolvedName) {
-                                comment.COMMENTOR_NAME_RESOLVED = resolvedName || "Unknown";
-                                pending--;
-                                maybeRender();
-                            });
-                        } else {
-                            comment.COMMENTOR_NAME_RESOLVED = comment.COMMENTOR_NAME ? comment.COMMENTOR_NAME.S : "Unknown";
-                            pending--;
-                            maybeRender();
-                        }
-                    });
-                });
-            }
-
-            function renderForumComments(comments, commentsList) {
-                commentsList.innerHTML = '';
-                comments.forEach(comment => {
-                    const commentElement = document.createElement('div');
-                    commentElement.className = 'comment';
-
-                    var date = '';
-                    if (!(comment.POST_DATE === undefined) && comment.POST_DATE.N) {
-                        date = new Date(Number(comment.POST_DATE.N)).toLocaleDateString();
-                        var secAgo = Date.now() - Number(comment.POST_DATE.N);
-                        if (secAgo < 1000 * 60 * 60 * 24) {
-                            date = 'Recently';
-                            if (secAgo > 1000 * 60 * 60) {
-                                var hrs = Math.floor(secAgo / (1000 * 60 * 60));
-                                date = `About ${hrs} hour${hrs > 1 ? 's' : ''} ago`;
+                    var pendingComments = comments.length;
+                    comments.forEach(function (comment) {
+                        getNameFromID(comment.COMMENTOR_ID.S, function (authorName) {
+                            var date = '';
+                            if (!(comment.POST_DATE === undefined) && comment.POST_DATE.N) {
+                                date = new Date(Number(comment.POST_DATE.N)).toLocaleDateString();
                             }
-                        }
-                    }
 
-                    commentElement.innerHTML = `
-            <div class="comment-header">
-                <span class="comment-author">${comment.COMMENTOR_NAME_RESOLVED}:</span>
-                <span class="comment-date">${date}</span>
-            </div>
-            <div class="comment-text">${comment.COMMENT_CONTENT.S}</div>
-        `;
+                            const commentElement = document.createElement('div');
+                            commentElement.className = 'comment';
+                            commentElement.innerHTML = '<div class="comment-header"><span class="comment-author">' + (authorName || 'Anonymous') + ':</span><span class="comment-date">' + date + '</span></div><div class="comment-text">' + comment.COMMENT_CONTENT.S + '</div>';
 
-                    commentsList.appendChild(commentElement);
-                });
-            }
+                            commentsList.appendChild(commentElement);
 
-            // Show/hide the add forum section based on login status
-            function toggleForumCreation(isLoggedIn) {
-                if (isLoggedIn && usersID) {
-                    addForumSection.style.display = 'block';
-                } else {
-                    addForumSection.style.display = 'none';
-                }
-            }
-
-            if (addForumForm) {
-                addForumForm.addEventListener('submit', function (e) {
-                    e.preventDefault();
-
-                    const titleInput = document.getElementById('forumTitle');
-                    const contentInput = document.getElementById('forumContent');
-
-                    const title = titleInput.value.trim();
-                    const content = contentInput.value.trim();
-
-                    // Validation
-                    if (!title || !content) {
-                        showForumAlert(forumErrorAlert);
-                        return;
-                    }
-
-                    if (!usersID) {
-                        forumErrorAlert.textContent = 'You must be logged in to create a forum.';
-                        showForumAlert(forumErrorAlert);
-                        return;
-                    }
-
-                    // Call the backend function (assuming it exists)
-                    try {
-                        addForum(title, content, usersID, function (success) {
-                            if (success) {
-                                // Clear form
-                                titleInput.value = '';
-                                contentInput.value = '';
-
-                                // Show success message
-                                showForumAlert(forumSuccessAlert);
-
-                                // Optionally reload forums list if you have that functionality
-                                loadForums();
-                            } else {
-                                forumErrorAlert.textContent = 'Failed to create forum. Please try again.';
-                                showForumAlert(forumErrorAlert);
+                            pendingComments--;
+                            if (pendingComments === 0 && commentsList.children.length === 0) {
+                                commentsList.innerHTML = '<p style="color: var(--text-dim); font-size: 0.875rem;">No comments yet.</p>';
                             }
                         });
-                    } catch (error) {
-                        console.error('Error creating forum:', error);
-                        forumErrorAlert.textContent = 'An error occurred while creating the forum.';
-                        showForumAlert(forumErrorAlert);
+                    });
+                });
+            }
+
+            function filterForums() {
+                renderForums();
+            }
+
+            function onSignIn(response) {
+                const payload = JSON.parse(atob(response.credential.split('.')[1]));
+                usersName = payload.name;
+                usersImageURL = payload.picture;
+                usersID = payload.sub;
+
+                addUser(usersID, usersName, function (success) {
+                    if (success) {
+                        document.getElementById('signInContainer').style.display = 'none';
+                        document.getElementById('addForumSection').style.display = 'block';
                     }
                 });
             }
 
-            function showForumAlert(alertElement) {
-                alertElement.style.display = 'block';
-                setTimeout(() => {
-                    alertElement.style.display = 'none';
-                }, 3000);
-            }
+            addForumForm.addEventListener('submit', function (e) {
+                e.preventDefault();
 
-            // Expose the toggle function globally so it can be called from your login handler
-            window.toggleForumCreation = toggleForumCreation;
+                const titleInput = document.getElementById('forumTitle');
+                const contentInput = document.getElementById('forumContent');
 
-            toggleForumCreation(true);
-        });
-        function onSignIn(response) {
-            const container = document.getElementById('signInContainer');
-            container.classList.remove('active');
-            const responsePayload = decodeJwtResponse(response.credential);
+                const title = titleInput.value.trim();
+                const content = contentInput.value.trim();
 
-            console.log("ID: " + responsePayload.sub);
-            console.log('Full Name: ' + responsePayload.name);
-            console.log('Given Name: ' + responsePayload.given_name);
-            console.log('Family Name: ' + responsePayload.family_name);
-            console.log("Image URL: " + responsePayload.picture);
-            console.log("Email: " + responsePayload.email);
-
-            usersName = responsePayload.name;
-            usersImageURL = responsePayload.picture;
-            usersID = responsePayload.sub;
-
-            // Only add user if they don't exist
-            getNameFromID(usersID, function (name) {
-                if (!name) {
-                    addUser(usersID, usersName, function (success) {
-                        if (!success) {
-                            console.error('Failed to add user record');
-                        }
-                    });
+                if (!title || !content) {
+                    showAlert(forumErrorAlert);
+                    return;
                 }
+
+                if (!usersID) {
+                    alert('You must be signed in to create a forum.');
+                    return;
+                }
+
+                addForum(title, content, usersID, function (success) {
+                    if (success) {
+                        titleInput.value = '';
+                        contentInput.value = '';
+                        showAlert(forumSuccessAlert);
+                        loadForums();
+                    }
+                });
             });
-
-            // Show forum creation section
-            if (window.toggleForumCreation) {
-                window.toggleForumCreation(true);
-            }
-
-        }
-
-
-
-        function decodeJwtResponse(token) {
-            let base64Url = token.split('.')[1];
-            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            let jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-
-            return JSON.parse(jsonPayload);
-        }
-        //onSignIn();
+        });
     </script>
 </body>
 
